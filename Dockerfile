@@ -7,6 +7,8 @@ RUN mkdir -p /opt/app \
 && apk update \
 && apk upgrade \
 && apk add --no-cache bash \
+&& apk add libstdc++ \
+&& rm -rf /var/cache/apk/* \
 && ./gradlew clean build -x check \
 && cp -v build/libs/redemption*.jar /opt/app/app.jar \
 && cd /opt/app \
