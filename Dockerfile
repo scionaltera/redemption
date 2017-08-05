@@ -1,4 +1,4 @@
-FROM frovlad/alpine-oraclejdk8:slim
+FROM frolvlad/alpine-oraclejdk8:slim
 MAINTAINER Peter Keeler <peter@bonevm.com>
 EXPOSE 8080
 COPY . /opt/build/
