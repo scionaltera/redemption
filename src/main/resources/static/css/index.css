@@ -18,3 +18,9 @@ body {
     background-color: white;
     padding: 5px 15px;
 }
+
+#copyright {
+    position: absolute;
+    bottom: 0;
+    font-size: x-small;
+}
