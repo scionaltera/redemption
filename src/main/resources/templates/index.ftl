@@ -13,10 +13,13 @@
     <link rel="stylesheet" href="css/index.css"/>
 </head>
 <body>
-<div class="container-fluid" id="title">
+<div class="container-fluid">
     <div class="row">
-        <div class="col-md-12 text-center">
-            <span>Redemption</span>
+        <div id="title" class="col-md-12 text-center">
+            <span class="visible-lg-block">Redemption</span>
+            <span class="visible-md-block">Redemption</span>
+            <span class="visible-sm-block">Redemption</span>
+            <span class="visible-xs-block">Redemption</span>
         </div>
     </div>
     <div class="row">

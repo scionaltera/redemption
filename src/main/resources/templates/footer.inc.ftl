@@ -1,5 +1,6 @@
 <div id="copyright">
-    <p>Redemption v${version!"SNAPSHOT"}<br/>Copyright &copy; 2017 1UpOnCancer</p>
+    <p class="visible-lg-block">Redemption v${version!"SNAPSHOT"}<br/>Copyright &copy; 2017 1UpOnCancer</p>
+    <p class="visible-md-block visible-sm-block visible-xs-block">Redemption v${version!"SNAPSHOT"}<br/>Copyright &copy; 2017 1UpOnCancer</p>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha256-k2WSCIexGzOj3Euiig+TlR8gA0EmPjuc79OEeY5L45g=" crossorigin="anonymous"></script>

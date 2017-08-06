@@ -10,3 +10,11 @@ body {
     bottom: 0;
     font-size: x-small;
 }
+
+#copyright p:nth-of-type(1) {
+    color: black;
+}
+
+#copyright p:nth-of-type(2) {
+    color: white;
+}
