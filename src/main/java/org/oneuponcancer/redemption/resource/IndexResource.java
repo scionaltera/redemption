@@ -6,15 +6,25 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.inject.Inject;
 import java.security.Principal;
 
 @Controller
 public class IndexResource {
+    private String applicationVersion;
+
+    @Inject
+    public IndexResource(String applicationVersion) {
+        this.applicationVersion = applicationVersion;
+    }
+
     @RequestMapping("/")
-    public String index(Principal principal) {
+    public String index(Principal principal, Model model) {
         if (principal != null) {
             return "redirect:/dashboard";
         }
+
+        model.addAttribute("version", applicationVersion);
 
         return "index";
     }
@@ -32,11 +42,15 @@ public class IndexResource {
             model.addAttribute("message", "Invalid credentials.");
         }
 
+        model.addAttribute("version", applicationVersion);
+
         return "index";
     }
 
     @RequestMapping("/dashboard")
-    public String dashboard() {
+    public String dashboard(Model model) {
+        model.addAttribute("version", applicationVersion);
+
         return "dashboard";
     }
 }
