@@ -1,10 +1,3 @@
-body {
-    background-size: cover;
-    background: darkblue url('../img/maxresdefault.jpg') no-repeat fixed center center;
-    font-family: 'Droid Sans', sans-serif;
-    color: white;
-}
-
 #title span:first-of-type {
     font-family: 'Permanent Marker', cursive;
     font-size: 10em;
@@ -17,10 +10,4 @@ body {
 #login-form p:first-of-type {
     background-color: white;
     padding: 5px 15px;
-}
-
-#copyright {
-    position: absolute;
-    bottom: 0;
-    font-size: x-small;
 }
