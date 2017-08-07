@@ -4,6 +4,7 @@ buildscript {
     }
 
     dependencies {
+        classpath 'se.transmode.gradle:gradle-docker:1.2'
         classpath group: 'org.springframework.boot', name: 'spring-boot-gradle-plugin', version: '1.5.6.RELEASE'
     }
 }
@@ -11,19 +12,11 @@ buildscript {
 group 'org.oneuponcancer'
 
 apply plugin: 'java'
+apply plugin: 'docker'
 apply plugin: 'org.springframework.boot'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
-
-jar {
-    baseName = 'redemption'
-    version = project.version
-
-    manifest {
-        attributes 'Implementation-Version': project.version
-    }
-}
 
 repositories {
     mavenCentral()
@@ -39,7 +32,31 @@ dependencies {
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
     }
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '1.5.6.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-mongodb', version: '1.5.6.RELEASE'
     compile group: 'javax.inject', name: 'javax.inject', version: '1'
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+jar {
+    baseName = 'redemption'
+    version = project.version
+
+    manifest {
+        attributes 'Implementation-Version': project.version
+    }
+}
+
+task buildDocker(type: Docker, dependsOn: build) {
+    push = false
+    applicationName = jar.getBaseName()
+    dockerfile = file('src/main/docker/Dockerfile')
+    tagVersion = "latest"
+
+    doFirst {
+        copy {
+            from jar
+            into stageDir
+        }
+    }
 }

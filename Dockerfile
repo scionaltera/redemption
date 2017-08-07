@@ -1,3 +1,7 @@
+#
+# This is the "production" Dockerfile that is used by the official build on Docker Hub. It creates a very lean
+# image with a JRE and the Redemption JAR, and not a whole lot else.
+#
 FROM frolvlad/alpine-oraclejdk8:slim
 MAINTAINER Peter Keeler <peter@bonevm.com>
 EXPOSE 8080
