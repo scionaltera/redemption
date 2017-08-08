@@ -1,0 +1,23 @@
+#
+# This docker-compose.yml is meant to help with local development.
+#
+# Using docker-compose and this configuration file you can spin up Redemption and all the databases and other
+# services it may need all at once to get a fully functional development copy of the software running. This
+# environment is also configured to expose the remote debugging port (5005) on Redemption so that you can attach
+# your debugger and use breakpoints to examine any problems you may find.
+#
+
+version: "2"
+services:
+  mongo:
+    image: mongo
+    ports:
+     - "27017"
+  redemption:
+    image: org.oneuponcancer/redemption:latest
+    ports:
+     - "8080:8080"
+     - "5005:5005"
+    links:
+     - mongo
+    env_file: secrets.env
