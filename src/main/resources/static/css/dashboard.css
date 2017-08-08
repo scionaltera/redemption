@@ -1,4 +1,31 @@
-#auth-box {
-    background-color: antiquewhite;
-    padding: 20px;
+#auth-box-inner {
+    margin: 5px;
+    padding: 15px;
+    background-color: #383838;
+}
+
+#log-box-inner {
+    margin: 5px;
+    padding: 15px;
+    background-color: #383838;
+    font-size: small;
+}
+
+#log-box-inner span:first-of-type {
+    font-size: x-large;
+}
+
+#log-box-content {
+}
+
+#log-box-items {
+    list-style: none;
+    padding-left: 0;
+}
+
+#copyright {
+    margin: 5px;
+    padding: 15px;
+    background-color: #383838;
+    font-size: xx-small;
 }

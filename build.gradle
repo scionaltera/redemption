@@ -4,14 +4,16 @@ buildscript {
     }
 
     dependencies {
-        classpath 'se.transmode.gradle:gradle-docker:1.2'
+        classpath group: 'se.transmode.gradle', name: 'gradle-docker', version: '1.2'
         classpath group: 'org.springframework.boot', name: 'spring-boot-gradle-plugin', version: '1.5.6.RELEASE'
+        classpath group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: '1.1.11'
     }
 }
 
 group 'org.oneuponcancer'
 
 apply plugin: 'java'
+apply plugin: 'info.solidsoft.pitest'
 apply plugin: 'docker'
 apply plugin: 'org.springframework.boot'
 
@@ -33,9 +35,22 @@ dependencies {
     }
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '1.5.6.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-mongodb', version: '1.5.6.RELEASE'
+
     compile group: 'javax.inject', name: 'javax.inject', version: '1'
+    compile group: 'org.apache.commons', name: 'commons-text', version: '1.1'
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.10.19'
+}
+
+pitest {
+    excludedClasses = [
+            "org.oneuponcancer.redemption.Redemption",
+            "org.oneuponcancer.redemption.config.*"
+    ]
+    coverageThreshold = 70
+    mutationThreshold = 70
+    timestampedReports = false
 }
 
 jar {
@@ -60,3 +75,5 @@ task buildDocker(type: Docker, dependsOn: build) {
         }
     }
 }
+
+test.finalizedBy project.tasks.pitest
