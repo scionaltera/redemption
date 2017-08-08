@@ -11,11 +11,15 @@ import org.springframework.security.authentication.event.AbstractAuthenticationE
 import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 @Component
 public class AuditLogService implements ApplicationListener<AbstractAuthenticationEvent> {
@@ -57,7 +61,8 @@ public class AuditLogService implements ApplicationListener<AbstractAuthenticati
     private void onApplicationEvent(AuthenticationSuccessEvent event) {
         User principal = (User)event.getAuthentication().getPrincipal();
         String username = principal.getUsername();
-        String remoteAddress = ((WebAuthenticationDetails)((UsernamePasswordAuthenticationToken)event.getSource()).getDetails()).getRemoteAddress();
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        String remoteAddress = extractRemoteIp(request);
 
         log(username, remoteAddress, "Successful authentication.");
     }
@@ -65,8 +70,31 @@ public class AuditLogService implements ApplicationListener<AbstractAuthenticati
     private void onApplicationEvent(AuthenticationFailureBadCredentialsEvent event) {
         UsernamePasswordAuthenticationToken principal = (UsernamePasswordAuthenticationToken)event.getAuthentication();
         String username = (String)principal.getPrincipal();
-        String remoteAddress = ((WebAuthenticationDetails)principal.getDetails()).getRemoteAddress();
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        String remoteAddress = extractRemoteIp(request);
 
         log(username, remoteAddress, "Failed authentication attempt.");
+    }
+
+    private String extractRemoteIp(HttpServletRequest request) {
+        String forwardedHeader = request.getHeader("x-forwarded-for");
+
+        if (forwardedHeader != null) {
+            String[] addresses = forwardedHeader.split("[,]");
+
+            for (String address : addresses) {
+                try {
+                    InetAddress inetAddress = InetAddress.getByName(address);
+
+                    if (!inetAddress.isSiteLocalAddress()) {
+                        return inetAddress.getHostAddress();
+                    }
+                } catch (UnknownHostException e) {
+                    LOGGER.debug("Failed to resolve IP for address: {}", address);
+                }
+            }
+        }
+
+        return request.getRemoteAddr();
     }
 }
