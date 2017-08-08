@@ -46,7 +46,8 @@ dependencies {
 pitest {
     excludedClasses = [
             "org.oneuponcancer.redemption.Redemption",
-            "org.oneuponcancer.redemption.config.*"
+            "org.oneuponcancer.redemption.config.*",
+            "org.oneuponcancer.redemption.wrapper.*"
     ]
     coverageThreshold = 70
     mutationThreshold = 70
