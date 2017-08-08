@@ -3,6 +3,7 @@ package org.oneuponcancer.redemption.service;
 import org.apache.commons.text.StringEscapeUtils;
 import org.oneuponcancer.redemption.model.AuditLog;
 import org.oneuponcancer.redemption.repository.AuditLogRepository;
+import org.oneuponcancer.redemption.wrapper.RequestContextHolderWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
@@ -13,7 +14,6 @@ import org.springframework.security.authentication.event.AuthenticationSuccessEv
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.inject.Inject;
@@ -26,10 +26,12 @@ public class AuditLogService implements ApplicationListener<AbstractAuthenticati
     private static final Logger LOGGER = LoggerFactory.getLogger(AuditLogService.class);
 
     private AuditLogRepository auditLogRepository;
+    private RequestContextHolderWrapper requestContextHolderWrapper;
 
     @Inject
-    public AuditLogService(AuditLogRepository auditLogRepository) {
+    public AuditLogService(AuditLogRepository auditLogRepository, RequestContextHolderWrapper requestContextHolderWrapper) {
         this.auditLogRepository = auditLogRepository;
+        this.requestContextHolderWrapper = requestContextHolderWrapper;
     }
 
     public void log(String username, String remoteAddress, String message) {
@@ -61,7 +63,7 @@ public class AuditLogService implements ApplicationListener<AbstractAuthenticati
     private void onApplicationEvent(AuthenticationSuccessEvent event) {
         User principal = (User)event.getAuthentication().getPrincipal();
         String username = principal.getUsername();
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        HttpServletRequest request = ((ServletRequestAttributes) requestContextHolderWrapper.getRequestAttributes()).getRequest();
         String remoteAddress = extractRemoteIp(request);
 
         log(username, remoteAddress, "Successful authentication.");
@@ -70,7 +72,7 @@ public class AuditLogService implements ApplicationListener<AbstractAuthenticati
     private void onApplicationEvent(AuthenticationFailureBadCredentialsEvent event) {
         UsernamePasswordAuthenticationToken principal = (UsernamePasswordAuthenticationToken)event.getAuthentication();
         String username = (String)principal.getPrincipal();
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        HttpServletRequest request = ((ServletRequestAttributes) requestContextHolderWrapper.getRequestAttributes()).getRequest();
         String remoteAddress = extractRemoteIp(request);
 
         log(username, remoteAddress, "Failed authentication attempt.");
