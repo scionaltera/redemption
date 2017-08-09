@@ -1,5 +1,6 @@
 package org.oneuponcancer.redemption.service;
 
+import org.oneuponcancer.redemption.model.Permission;
 import org.oneuponcancer.redemption.model.Staff;
 import org.oneuponcancer.redemption.repository.StaffRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -27,6 +28,10 @@ public class StaffDetailsService implements UserDetailsService {
 
         if (staff == null) {
             throw new UsernameNotFoundException("Username not found.");
+        }
+
+        if (!staff.hasPermission(Permission.LOGIN)) {
+            throw new UsernameNotFoundException("User is not allowed to log in.");
         }
 
         return new User(username, staff.getPassword(), Collections.singletonList(new SimpleGrantedAuthority("USER")));

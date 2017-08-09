@@ -6,9 +6,12 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.oneuponcancer.redemption.model.Permission;
 import org.oneuponcancer.redemption.model.Staff;
 import org.oneuponcancer.redemption.repository.StaffRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -49,6 +52,9 @@ public class StaffLoaderTest {
 
         assertEquals(StaffLoader.DEFAULT_USER, staff.getUsername());
         assertEquals(StaffLoader.DEFAULT_PASS, staff.getPassword());
+
+        Arrays.stream(Permission.values()).forEach(p -> assertTrue(staff.hasPermission(Permission.LOGIN)));
+
         assertFalse(staffLoader.isSecure());
     }
 

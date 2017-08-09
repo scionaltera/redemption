@@ -1,5 +1,6 @@
 package org.oneuponcancer.redemption.loader;
 
+import org.oneuponcancer.redemption.model.Permission;
 import org.oneuponcancer.redemption.model.Staff;
 import org.oneuponcancer.redemption.repository.StaffRepository;
 import org.slf4j.Logger;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import java.util.Arrays;
 
 @Component
 public class StaffLoader {
@@ -35,6 +37,9 @@ public class StaffLoader {
 
             admin.setUsername(DEFAULT_USER);
             admin.setPassword(bCryptPasswordEncoder.encode(DEFAULT_PASS));
+
+            // admin has every permission
+            Arrays.stream(Permission.values()).forEach(admin::addPermission);
 
             staffRepository.save(admin);
 

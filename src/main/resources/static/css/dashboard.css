@@ -10,6 +10,16 @@
     background-color: #383838;
 }
 
+#perm-box-inner {
+    margin: 5px;
+    padding: 15px;
+    background-color: #383838;
+}
+
+#perm-box-inner p:first-of-type {
+    font-size: x-large;
+}
+
 #log-box-inner {
     margin: 5px;
     padding: 15px;
@@ -17,7 +27,7 @@
     font-size: small;
 }
 
-#log-box-inner span:first-of-type {
+#log-box-inner p:first-of-type {
     font-size: x-large;
 }
 

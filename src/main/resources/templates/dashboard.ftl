@@ -32,10 +32,24 @@
             </div>
         </div>
     </div>
+<#if staff??>
+    <div class="row">
+        <div id="perm-box-outer" class="col-md-12">
+            <div id="perm-box-inner">
+                <p>Permissions for ${staff.username?capitalize}</p>
+                <ul>
+                <#list staff.permissions as permission>
+                    <li>${permission.description}</li>
+                </#list>
+                </ul>
+            </div>
+        </div>
+    </div>
+</#if>
     <div class="row">
         <div id="log-box-outer" class="col-md-12">
             <div id="log-box-inner">
-                <span>Audit Log</span>
+                <p>Audit Log</p>
                 <div id="log-box-content"></div>
             </div>
         </div>

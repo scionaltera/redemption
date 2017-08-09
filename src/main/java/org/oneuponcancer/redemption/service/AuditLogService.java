@@ -66,7 +66,7 @@ public class AuditLogService implements ApplicationListener<AbstractAuthenticati
         HttpServletRequest request = ((ServletRequestAttributes) requestContextHolderWrapper.getRequestAttributes()).getRequest();
         String remoteAddress = extractRemoteIp(request);
 
-        log(username, remoteAddress, "Successful authentication.");
+        log(username, remoteAddress, "Successful authentication");
     }
 
     private void onApplicationEvent(AuthenticationFailureBadCredentialsEvent event) {
@@ -75,7 +75,7 @@ public class AuditLogService implements ApplicationListener<AbstractAuthenticati
         HttpServletRequest request = ((ServletRequestAttributes) requestContextHolderWrapper.getRequestAttributes()).getRequest();
         String remoteAddress = extractRemoteIp(request);
 
-        log(username, remoteAddress, "Failed authentication attempt.");
+        log(username, remoteAddress, event.getException().getMessage());
     }
 
     private String extractRemoteIp(HttpServletRequest request) {
