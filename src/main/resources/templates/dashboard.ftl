@@ -11,6 +11,17 @@
 </head>
 <body>
 <div class="container-fluid">
+<#if secure == false>
+    <div class="row">
+        <div class="col-md-12">
+            <div id="security-box-inner">
+            <span>Warning! The default staff account is enabled, which presents a security risk because it uses a
+                username and password that are publicly available on GitHub. Please either delete the account or
+                change its password before using Redemption in a production setting.</span>
+            </div>
+        </div>
+    </div>
+</#if>
     <div class="row">
         <div id="auth-box-outer" class="col-md-12">
             <div id="auth-box-inner">
@@ -21,10 +32,24 @@
             </div>
         </div>
     </div>
+<#if staff??>
+    <div class="row">
+        <div id="perm-box-outer" class="col-md-12">
+            <div id="perm-box-inner">
+                <p>Permissions for ${staff.username?capitalize}</p>
+                <ul>
+                <#list staff.permissions as permission>
+                    <li>${permission.description}</li>
+                </#list>
+                </ul>
+            </div>
+        </div>
+    </div>
+</#if>
     <div class="row">
         <div id="log-box-outer" class="col-md-12">
             <div id="log-box-inner">
-                <span>Audit Log</span>
+                <p>Audit Log</p>
                 <div id="log-box-content"></div>
             </div>
         </div>

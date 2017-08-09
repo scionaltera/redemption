@@ -1,6 +1,9 @@
 package org.oneuponcancer.redemption.resource;
 
 
+import org.oneuponcancer.redemption.loader.StaffLoader;
+import org.oneuponcancer.redemption.model.Staff;
+import org.oneuponcancer.redemption.repository.StaffRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,10 +15,14 @@ import java.security.Principal;
 @Controller
 public class IndexResource {
     private String applicationVersion;
+    private StaffLoader staffLoader;
+    private StaffRepository staffRepository;
 
     @Inject
-    public IndexResource(String applicationVersion) {
+    public IndexResource(String applicationVersion, StaffLoader staffLoader, StaffRepository staffRepository) {
         this.applicationVersion = applicationVersion;
+        this.staffLoader = staffLoader;
+        this.staffRepository = staffRepository;
     }
 
     @RequestMapping("/")
@@ -48,8 +55,15 @@ public class IndexResource {
     }
 
     @RequestMapping("/dashboard")
-    public String dashboard(Model model) {
+    public String dashboard(Principal principal, Model model) {
         model.addAttribute("version", applicationVersion);
+        model.addAttribute("secure", staffLoader.isSecure());
+
+        Staff staff = staffRepository.findByUsername(principal.getName());
+
+        if (staff != null) {
+            model.addAttribute("staff", staff);
+        }
 
         return "dashboard";
     }
