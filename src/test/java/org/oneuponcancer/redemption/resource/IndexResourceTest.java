@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.oneuponcancer.redemption.loader.StaffLoader;
 import org.springframework.ui.Model;
 
 import java.security.Principal;
@@ -20,13 +21,16 @@ public class IndexResourceTest {
     @Mock
     private Model model;
 
+    @Mock
+    private StaffLoader staffLoader;
+
     private IndexResource indexResource;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        indexResource = new IndexResource(APPLICATION_VERSION);
+        indexResource = new IndexResource(APPLICATION_VERSION, staffLoader);
     }
 
     @Test
@@ -82,6 +86,7 @@ public class IndexResourceTest {
         String result = indexResource.dashboard(model);
 
         verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
+        verify(model).addAttribute(eq("secure"), anyBoolean());
 
         assertEquals("dashboard", result);
     }

@@ -1,6 +1,7 @@
 package org.oneuponcancer.redemption.resource;
 
 
+import org.oneuponcancer.redemption.loader.StaffLoader;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,10 +13,12 @@ import java.security.Principal;
 @Controller
 public class IndexResource {
     private String applicationVersion;
+    private StaffLoader staffLoader;
 
     @Inject
-    public IndexResource(String applicationVersion) {
+    public IndexResource(String applicationVersion, StaffLoader staffLoader) {
         this.applicationVersion = applicationVersion;
+        this.staffLoader = staffLoader;
     }
 
     @RequestMapping("/")
@@ -50,6 +53,7 @@ public class IndexResource {
     @RequestMapping("/dashboard")
     public String dashboard(Model model) {
         model.addAttribute("version", applicationVersion);
+        model.addAttribute("secure", staffLoader.isSecure());
 
         return "dashboard";
     }
