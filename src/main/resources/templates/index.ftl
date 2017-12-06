@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <#include "stdlinks.inc.ftl">
-    <link rel="stylesheet" href="css/index.css"/>
+    <link rel="stylesheet" href="/css/index.css"/>
 </head>
 <body>
 <div class="container-fluid">

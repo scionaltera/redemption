@@ -1,3 +1,3 @@
 <div id="copyright">
-    <p>Redemption v${version!"SNAPSHOT"}<br/>Copyright &copy; 2017 1UpOnCancer</p>
+    <span>Redemption v${version!"SNAPSHOT"}<br/>Copyright &copy; 2017 1UpOnCancer</span>
 </div>

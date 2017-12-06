@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <#include "stdlinks.inc.ftl">
-    <link rel="stylesheet" href="css/dashboard.css"/>
+    <link rel="stylesheet" href="/css/dashboard.css"/>
 </head>
 <body>
 <div class="container-fluid">
@@ -34,7 +34,15 @@
     </div>
 <#if staff??>
     <div class="row">
-        <div id="perm-box-outer" class="col-md-12">
+        <div id="staff-box-outer" class="col-md-6">
+            <div id="staff-box-inner">
+                <p>Staff Editor <button id="staff-button-create" class="btn btn-success">Create</button></p>
+                <table id="staff-box-content" class="table">
+                    <tr><th>Name</th><th>Actions</th></tr>
+                </table>
+            </div>
+        </div>
+        <div id="perm-box-outer" class="col-md-6">
             <div id="perm-box-inner">
                 <p>Permissions for ${staff.username?capitalize}</p>
                 <ul>
@@ -63,5 +71,6 @@
 
 <#include "stdimports.inc.ftl">
 <script type="text/javascript" src="js/auditlog.js"></script>
+<script type="text/javascript" src="js/staffselect.js"></script>
 </body>
 </html>

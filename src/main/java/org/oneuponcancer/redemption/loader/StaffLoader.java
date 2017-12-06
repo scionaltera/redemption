@@ -22,7 +22,7 @@ public class StaffLoader {
     private StaffRepository staffRepository;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    private boolean isSecure = true;
+    private boolean isSecure = false;
 
     @Inject
     public StaffLoader(StaffRepository staffRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
@@ -31,7 +31,7 @@ public class StaffLoader {
     }
 
     @PostConstruct
-    public void load() {
+    public void evaluateSecurity() {
         if (staffRepository.count() == 0) {
             Staff admin = new Staff();
 
@@ -43,18 +43,17 @@ public class StaffLoader {
 
             staffRepository.save(admin);
 
-            isSecure = false;
-
             LOGGER.warn("No staff accounts found in database. Populated the default account.");
             LOGGER.warn("Please be sure to create new accounts before using Redemption in a production setting!");
         } else {
             Staff admin = staffRepository.findByUsername(DEFAULT_USER);
 
             if (bCryptPasswordEncoder.matches(DEFAULT_PASS, admin.getPassword())) {
-                isSecure = false;
-
-                LOGGER.warn("The default Staff account exists in the database!");
+                LOGGER.warn("The default staff account exists in the database!");
                 LOGGER.warn("Please be sure to delete it or change the password before using Redemption in a production setting!");
+            } else {
+                LOGGER.info("The default staff account has been changed or removed. 👍");
+                isSecure = true;
             }
         }
     }
