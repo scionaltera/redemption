@@ -78,7 +78,7 @@ public class AuditLogService implements ApplicationListener<AbstractAuthenticati
         log(username, remoteAddress, event.getException().getMessage());
     }
 
-    private String extractRemoteIp(HttpServletRequest request) {
+    public String extractRemoteIp(HttpServletRequest request) {
         String forwardedHeader = request.getHeader("x-forwarded-for");
 
         if (forwardedHeader != null) {

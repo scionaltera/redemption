@@ -16,16 +16,16 @@
                 <form action="/api/v1/staff/${staff.id}" method="post">
                     <div class="form-group">
                         <label for="">Username</label>
-                        <input type="text" class="form-control" id="staff-username" placeholder="Username" value="${staff.username}">
+                        <input type="text" class="form-control" name="username" id="staff-username" placeholder="Username" value="${staff.username}">
                     </div>
                     <div class="form-group">
                         <label for="">Password</label>
-                        <input type="password" class="form-control" id="staff-password" placeholder="Password">
+                        <input type="password" class="form-control" name="password" id="staff-password" placeholder="Password">
                     </div>
                 <#list permissions as permission>
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" ${staff.permissions?seq_contains(permission)?string("checked='true'", "")}> ${permission.description}
+                            <input type="checkbox" name="permissions" value="${permission.unique}" id="perm-${permission.unique}" ${staff.permissions?seq_contains(permission)?string("checked='true'", "")}> ${permission.description}
                         </label>
                     </div>
                 </#list>

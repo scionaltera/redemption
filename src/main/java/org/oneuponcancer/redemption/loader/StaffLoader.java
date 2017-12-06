@@ -48,11 +48,11 @@ public class StaffLoader {
         } else {
             Staff admin = staffRepository.findByUsername(DEFAULT_USER);
 
-            if (bCryptPasswordEncoder.matches(DEFAULT_PASS, admin.getPassword())) {
+            if (admin != null && bCryptPasswordEncoder.matches(DEFAULT_PASS, admin.getPassword())) {
                 LOGGER.warn("The default staff account exists in the database!");
                 LOGGER.warn("Please be sure to delete it or change the password before using Redemption in a production setting!");
             } else {
-                LOGGER.info("The default staff account has been changed or removed. 👍");
+                LOGGER.info("Good! The default staff account has been changed or removed.");
                 isSecure = true;
             }
         }
