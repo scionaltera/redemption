@@ -31,8 +31,18 @@ $(document).ready(function() {
 
             if ($permDeleteStaff.length !== 0) {
                 $staffBoxContent.find(".btn-delete").click(function () {
-                    alert("Delete " + $(this).attr('data-staff-id'));
-                    // hit delete API with staff id
+                    var header = $("meta[name='_csrf_header']").attr("content");
+                    var token = $("meta[name='_csrf']").attr("content");
+
+                    $.ajax({
+                        url: "/api/v1/staff/" + $(this).attr('data-staff-id'),
+                        method: "DELETE",
+                        headers: {
+                            [header]: token
+                        }
+                    }).done(function() {
+                        window.location = "/dashboard";
+                    });
 
                     event.preventDefault();
                     return false;

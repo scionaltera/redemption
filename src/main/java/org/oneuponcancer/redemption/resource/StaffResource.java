@@ -133,6 +133,32 @@ public class StaffResource {
         return "redirect:/dashboard";
     }
 
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @ResponseBody
+    public Staff deleteStaff(@PathVariable String id, Principal principal, HttpServletRequest request) {
+        if (((UsernamePasswordAuthenticationToken)principal).getAuthorities().stream().noneMatch(a -> a.getAuthority().equals(Permission.DELETE_STAFF.name()))) {
+            throw new InsufficientPermissionException("Not allowed to delete staff accounts.");
+        }
+
+        Staff staff = staffRepository.findOne(id);
+
+        if (staff == null) {
+            throw new NullPointerException("No such staff account found.");
+        }
+
+        staffRepository.delete(staff);
+        staffLoader.evaluateSecurity();
+
+        auditLogService.log(
+                principal.getName(),
+                auditLogService.extractRemoteIp(request),
+                String.format("Deleted staff member: %s (%s)",
+                        staff.getUsername(),
+                        staff.getId()));
+
+        return staff;
+    }
+
     @ExceptionHandler(NullPointerException.class)
     public void handleNotFoundException(NullPointerException ex, HttpServletResponse response) throws Exception {
         response.sendError(HttpStatus.NOT_FOUND.value(), ex.getMessage());

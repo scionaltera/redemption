@@ -4,7 +4,7 @@
 <head>
     <title>Edit Staff - Redemption</title>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <#include "stdmeta.inc.ftl">
     <#include "stdlinks.inc.ftl">
     <link rel="stylesheet" href="/css/staffedit.css"/>
 </head>
