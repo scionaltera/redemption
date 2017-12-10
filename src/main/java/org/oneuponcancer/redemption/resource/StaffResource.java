@@ -8,11 +8,13 @@ import org.oneuponcancer.redemption.model.transport.StaffCreateRequest;
 import org.oneuponcancer.redemption.model.transport.StaffEditRequest;
 import org.oneuponcancer.redemption.repository.StaffRepository;
 import org.oneuponcancer.redemption.service.AuditLogService;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,11 +24,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import javax.validation.ValidationException;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/api/v1/staff")
@@ -63,21 +67,18 @@ public class StaffResource {
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public String createStaff(StaffCreateRequest staffCreateRequest, Principal principal, HttpServletRequest request) {
+    public String createStaff(@Valid StaffCreateRequest staffCreateRequest, BindingResult bindingResult, Principal principal, HttpServletRequest request) {
         if (((UsernamePasswordAuthenticationToken)principal).getAuthorities().stream().noneMatch(a -> a.getAuthority().equals(Permission.CREATE_STAFF.name()))) {
             throw new InsufficientPermissionException("Not allowed to create staff accounts.");
         }
 
-        // TODO JSR-303?
-        // TODO name must meet minimum requirements
-        // TODO password must meet minimum requirements
+        if (bindingResult.hasErrors()) {
+            String errorMessages = bindingResult.getAllErrors()
+                    .stream()
+                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                    .collect(Collectors.joining("\n"));
 
-        if (StringUtils.isEmpty(staffCreateRequest.getUsername())) {
-            throw new ValidationException("Username cannot be empty.");
-        }
-
-        if (StringUtils.isEmpty(staffCreateRequest.getPassword())) {
-            throw new ValidationException("Password cannot be empty.");
+            throw new ValidationException(errorMessages);
         }
 
         Staff staff = new Staff();
@@ -100,7 +101,7 @@ public class StaffResource {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.POST)
-    public String updateStaff(@PathVariable String id, StaffEditRequest staffEditRequest, Principal principal, HttpServletRequest request) {
+    public String updateStaff(@PathVariable String id, @Valid StaffEditRequest staffEditRequest, BindingResult bindingResult, Principal principal, HttpServletRequest request) {
         if (((UsernamePasswordAuthenticationToken)principal).getAuthorities().stream().noneMatch(a -> a.getAuthority().equals(Permission.EDIT_STAFF.name()))) {
             throw new InsufficientPermissionException("Not allowed to edit staff accounts.");
         }
@@ -109,6 +110,15 @@ public class StaffResource {
 
         if (staff == null) {
             throw new NullPointerException("No such staff account found.");
+        }
+
+        if (bindingResult.hasErrors()) {
+            String errorMessages = bindingResult.getAllErrors()
+                    .stream()
+                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                    .collect(Collectors.joining("\n"));
+
+            throw new ValidationException(errorMessages);
         }
 
         staff.setUsername(staffEditRequest.getUsername());
