@@ -6,7 +6,7 @@
 
     <#include "stdmeta.inc.ftl">
     <#include "stdlinks.inc.ftl">
-    <link rel="stylesheet" href="/css/index.css"/>
+    <link rel="stylesheet" href="<@spring.url '/css/index.css'/>"/>
 </head>
 <body>
 <div class="container-fluid">
