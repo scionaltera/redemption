@@ -14,7 +14,10 @@
     <div class="row">
         <div class="col-md-12">
             <div id="staff-create-form">
-                <form action="/api/v1/staff" method="post">
+                <form action="<@spring.url '/api/v1/staff'/>" method="post">
+                    <div id="error-box" class="form-group invisible">
+                        <p class="text-danger"></p>
+                    </div>
                     <div class="form-group">
                         <label for="">Username</label>
                         <input type="text" class="form-control" name="username" id="staff-username" placeholder="Username"">
@@ -45,5 +48,6 @@
 </div>
 
 <#include "stdimports.inc.ftl">
+<script src="<@spring.url '/js/staffcreate.js'/>"></script>
 </body>
 </html>

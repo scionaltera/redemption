@@ -14,7 +14,10 @@
     <div class="row">
         <div class="col-md-12">
             <div id="staff-edit-form">
-                <form action="/api/v1/staff/${staff.id}" method="post">
+                <form action="<@spring.url '/api/v1/staff/${staff.id}'/>" method="post">
+                    <div id="error-box" class="form-group invisible">
+                        <p class="text-danger"></p>
+                    </div>
                     <div class="form-group">
                         <label for="">Username</label>
                         <input type="text" class="form-control" name="username" id="staff-username" placeholder="Username" value="${staff.username}">
@@ -45,5 +48,6 @@
 </div>
 
 <#include "stdimports.inc.ftl">
+<script src="<@spring.url '/js/staffedit.js'/>"></script>
 </body>
 </html>
