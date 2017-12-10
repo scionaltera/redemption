@@ -3,6 +3,7 @@ package org.oneuponcancer.redemption.service;
 import org.oneuponcancer.redemption.model.Permission;
 import org.oneuponcancer.redemption.model.Staff;
 import org.oneuponcancer.redemption.repository.StaffRepository;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,7 +12,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class StaffDetailsService implements UserDetailsService {
@@ -34,6 +36,8 @@ public class StaffDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("User is not allowed to log in.");
         }
 
-        return new User(username, staff.getPassword(), Collections.singletonList(new SimpleGrantedAuthority("USER")));
+        List<GrantedAuthority> roles = staff.getPermissions().stream().map(p -> new SimpleGrantedAuthority(p.name())).collect(Collectors.toList());
+
+        return new User(username, staff.getPassword(), roles);
     }
 }

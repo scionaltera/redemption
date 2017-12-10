@@ -4,12 +4,17 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.oneuponcancer.redemption.exception.InsufficientPermissionException;
 import org.oneuponcancer.redemption.model.AuditLog;
+import org.oneuponcancer.redemption.model.Permission;
 import org.oneuponcancer.redemption.repository.AuditLogRepository;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -20,6 +25,9 @@ public class AuditLogResourceTest {
 
     @Mock
     private AuditLogRepository auditLogRepository;
+
+    @Mock
+    private UsernamePasswordAuthenticationToken principal;
 
     private AuditLogResource auditLogResource;
 
@@ -45,33 +53,45 @@ public class AuditLogResourceTest {
             return new PageImpl<>(items);
         });
 
+        when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.READ_LOGS.name())));
+
         auditLogResource = new AuditLogResource(REQUEST_MAX, auditLogRepository);
     }
 
     @Test
     public void testFetch() throws Exception {
-        List<AuditLog> results = auditLogResource.fetchAuditLogs(null);
+        List<AuditLog> results = auditLogResource.fetchAuditLogs(principal, null);
 
         assertEquals(REQUEST_MAX, results.size());
     }
 
-    @Test
-    public void testFetchLimited() throws Exception {
-        List<AuditLog> results = auditLogResource.fetchAuditLogs(3);
+    @Test(expected = InsufficientPermissionException.class)
+    public void testFetchNotAllowed() throws Exception {
+        when(principal.getAuthorities()).thenReturn(Collections.emptyList());
 
-        assertEquals(3, results.size());
+        auditLogResource.fetchAuditLogs(principal, null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFetchZero() throws Exception {
+        auditLogResource.fetchAuditLogs(principal, 0);
     }
 
     @Test
-    public void testFetchNegative() throws Exception {
-        List<AuditLog> results = auditLogResource.fetchAuditLogs(-1);
+    public void testFetchOne() throws Exception {
+        List<AuditLog> results = auditLogResource.fetchAuditLogs(principal, 1);
 
         assertEquals(1, results.size());
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testFetchTooMany() throws Exception {
-        List<AuditLog> results = auditLogResource.fetchAuditLogs(REQUEST_MAX + 1);
+        auditLogResource.fetchAuditLogs(principal, REQUEST_MAX + 1);
+    }
+
+    @Test
+    public void testFetchMax() throws Exception {
+        List<AuditLog> results = auditLogResource.fetchAuditLogs(principal, REQUEST_MAX);
 
         assertEquals(REQUEST_MAX, results.size());
     }

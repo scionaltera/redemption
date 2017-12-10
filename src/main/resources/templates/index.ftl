@@ -4,10 +4,9 @@
 <head>
     <title>Home - Redemption</title>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <#include "stdmeta.inc.ftl">
     <#include "stdlinks.inc.ftl">
-    <link rel="stylesheet" href="css/index.css"/>
+    <link rel="stylesheet" href="<@spring.url '/css/index.css'/>"/>
 </head>
 <body>
 <div class="container-fluid">
@@ -41,7 +40,6 @@
 </div>
 
 <#include "copyright.inc.ftl">
-
 <#include "stdimports.inc.ftl">
 </body>
 </html>

@@ -4,10 +4,10 @@
 <head>
     <title>Dashboard - Redemption</title>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <#include "stdmeta.inc.ftl">
     <#include "stdlinks.inc.ftl">
-    <link rel="stylesheet" href="css/dashboard.css"/>
+    <#include "internal.inc.ftl">
+    <link rel="stylesheet" href="<@spring.url '/css/dashboard.css'/>"/>
 </head>
 <body>
 <div class="container-fluid">
@@ -32,20 +32,30 @@
             </div>
         </div>
     </div>
-<#if staff??>
+<#if liststaff??>
     <div class="row">
-        <div id="perm-box-outer" class="col-md-12">
+        <div id="perm-box-outer" class="col-md-6">
             <div id="perm-box-inner">
                 <p>Permissions for ${staff.username?capitalize}</p>
                 <ul>
-                <#list staff.permissions as permission>
-                    <li>${permission.description}</li>
-                </#list>
+                    <#list staff.permissions as permission>
+                        <li>${permission.description}</li>
+                    </#list>
                 </ul>
+            </div>
+        </div>
+
+        <div id="staff-box-outer" class="col-md-6">
+            <div id="staff-box-inner">
+                <p>Staff Editor <button id="staff-button-create" class="btn btn-success" <#if createstaff??><#else>disabled</#if>>Create</button></p>
+                <table id="staff-box-content" class="table">
+                    <tr><th>Name</th><th>Actions</th></tr>
+                </table>
             </div>
         </div>
     </div>
 </#if>
+<#if readlogs??>
     <div class="row">
         <div id="log-box-outer" class="col-md-12">
             <div id="log-box-inner">
@@ -54,6 +64,7 @@
             </div>
         </div>
     </div>
+</#if>
     <div class="row">
         <div class="col-md-12">
         <#include "copyright.inc.ftl">
@@ -61,7 +72,15 @@
     </div>
 </div>
 
+<div class="invisible">
+<#if liststaff??><div id="perm-list-staff"></div></#if>
+<#if createstaff??><div id="perm-create-staff"></div></#if>
+<#if editstaff??><div id="perm-edit-staff"></div></#if>
+<#if deletestaff??><div id="perm-delete-staff"></div></#if>
+</div>
+
 <#include "stdimports.inc.ftl">
-<script type="text/javascript" src="js/auditlog.js"></script>
+<script type="text/javascript" src="<@spring.url 'js/auditlog.js'/>"></script>
+<script type="text/javascript" src="<@spring.url 'js/staffselect.js'/>"></script>
 </body>
 </html>

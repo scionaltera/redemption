@@ -43,7 +43,7 @@ public class StaffLoaderTest {
     public void testLoadEmptyDatabase() throws Exception {
         when(staffRepository.count()).thenReturn(0L);
 
-        staffLoader.load();
+        staffLoader.evaluateSecurity();
 
         verify(staffRepository).save(staffArgumentCaptor.capture());
         verify(bCryptPasswordEncoder).encode(eq(StaffLoader.DEFAULT_PASS));
@@ -68,7 +68,7 @@ public class StaffLoaderTest {
         when(staffRepository.count()).thenReturn(1L);
         when(staffRepository.findByUsername(eq(StaffLoader.DEFAULT_USER))).thenReturn(user);
 
-        staffLoader.load();
+        staffLoader.evaluateSecurity();
 
         verify(bCryptPasswordEncoder).matches(eq(StaffLoader.DEFAULT_PASS), eq(user.getPassword()));
 
@@ -85,7 +85,7 @@ public class StaffLoaderTest {
         when(staffRepository.count()).thenReturn(1L);
         when(staffRepository.findByUsername(eq(StaffLoader.DEFAULT_USER))).thenReturn(user);
 
-        staffLoader.load();
+        staffLoader.evaluateSecurity();
 
         verify(bCryptPasswordEncoder).matches(eq(StaffLoader.DEFAULT_PASS), eq(user.getPassword()));
 

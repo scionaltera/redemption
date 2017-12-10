@@ -4,6 +4,20 @@
     background-color: darkred;
 }
 
+#staff-box-inner {
+    margin: 5px;
+    padding: 15px;
+    background-color: #383838;
+}
+
+#staff-box-inner p:first-of-type {
+    font-size: x-large;
+}
+
+#staff-edit-select {
+    background-color: #383838;
+}
+
 #auth-box-inner {
     margin: 5px;
     padding: 15px;
@@ -31,17 +45,7 @@
     font-size: x-large;
 }
 
-#log-box-content {
-}
-
 #log-box-items {
     list-style: none;
     padding-left: 0;
-}
-
-#copyright {
-    margin: 5px;
-    padding: 15px;
-    background-color: #383838;
-    font-size: xx-small;
 }

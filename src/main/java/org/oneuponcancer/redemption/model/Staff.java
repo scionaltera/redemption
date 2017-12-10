@@ -46,6 +46,10 @@ public class Staff {
         permissions.add(permission);
     }
 
+    public void removePermission(Permission permission) {
+        permissions.remove(permission);
+    }
+
     public boolean hasPermission(Permission permission) {
         return permissions.contains(permission);
     }
