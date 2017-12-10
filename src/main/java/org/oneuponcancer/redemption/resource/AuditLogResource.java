@@ -45,9 +45,9 @@ public class AuditLogResource {
         if (count == null) {
             count = auditServiceRequestMax;
         } else if (count > auditServiceRequestMax) {
-            count = auditServiceRequestMax;
+            throw new IllegalArgumentException("Only " + auditServiceRequestMax + " results are allowed per request.");
         } else if (count < 1) {
-            count = 1;
+            throw new IllegalArgumentException("The number of returned results must be at least one.");
         }
 
         PageRequest request = new PageRequest(0, count, SORT_DESC);
@@ -59,5 +59,10 @@ public class AuditLogResource {
     @ExceptionHandler(InsufficientPermissionException.class)
     public void handleInsufficientPermissionException(InsufficientPermissionException ex, HttpServletResponse response) throws IOException {
         response.sendError(HttpStatus.FORBIDDEN.value(), ex.getMessage());
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public void handleIllegalArgument(IllegalArgumentException ex, HttpServletResponse response) throws IOException {
+        response.sendError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
     }
 }

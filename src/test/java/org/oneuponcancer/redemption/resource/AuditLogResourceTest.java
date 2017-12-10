@@ -72,23 +72,26 @@ public class AuditLogResourceTest {
         auditLogResource.fetchAuditLogs(principal, null);
     }
 
-    @Test
-    public void testFetchLimited() throws Exception {
-        List<AuditLog> results = auditLogResource.fetchAuditLogs(principal, 3);
-
-        assertEquals(3, results.size());
+    @Test(expected = IllegalArgumentException.class)
+    public void testFetchZero() throws Exception {
+        auditLogResource.fetchAuditLogs(principal, 0);
     }
 
     @Test
-    public void testFetchNegative() throws Exception {
-        List<AuditLog> results = auditLogResource.fetchAuditLogs(principal, -1);
+    public void testFetchOne() throws Exception {
+        List<AuditLog> results = auditLogResource.fetchAuditLogs(principal, 1);
 
         assertEquals(1, results.size());
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testFetchTooMany() throws Exception {
-        List<AuditLog> results = auditLogResource.fetchAuditLogs(principal, REQUEST_MAX + 1);
+        auditLogResource.fetchAuditLogs(principal, REQUEST_MAX + 1);
+    }
+
+    @Test
+    public void testFetchMax() throws Exception {
+        List<AuditLog> results = auditLogResource.fetchAuditLogs(principal, REQUEST_MAX);
 
         assertEquals(REQUEST_MAX, results.size());
     }

@@ -69,11 +69,42 @@ public class IndexResource {
 
         Staff staff = staffRepository.findByUsername(principal.getName());
 
+        model.addAttribute("staff", staff);
+
         if (staff != null) {
-            model.addAttribute("staff", staff);
+            if (((UsernamePasswordAuthenticationToken)principal).getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(Permission.LIST_STAFF.name()))) {
+                model.addAttribute("liststaff", true);
+            }
+
+            if (((UsernamePasswordAuthenticationToken)principal).getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(Permission.CREATE_STAFF.name()))) {
+                model.addAttribute("createstaff", true);
+            }
+
+            if (((UsernamePasswordAuthenticationToken)principal).getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(Permission.EDIT_STAFF.name()))) {
+                model.addAttribute("editstaff", true);
+            }
+
+            if (((UsernamePasswordAuthenticationToken)principal).getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(Permission.DELETE_STAFF.name()))) {
+                model.addAttribute("deletestaff", true);
+            }
+
+            if (((UsernamePasswordAuthenticationToken)principal).getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(Permission.READ_LOGS.name()))) {
+                model.addAttribute("readlogs", true);
+            }
         }
 
         return "dashboard";
+    }
+
+    @RequestMapping("/staff")
+    public String createStaff(Principal principal, Model model) {
+        if (((UsernamePasswordAuthenticationToken)principal).getAuthorities().stream().noneMatch(a -> a.getAuthority().equals(Permission.CREATE_STAFF.name()))) {
+            throw new InsufficientPermissionException("Not allowed to create staff accounts.");
+        }
+
+        model.addAttribute("permissions", Permission.values());
+
+        return "staffcreate";
     }
 
     @RequestMapping("/staff/{id}")
