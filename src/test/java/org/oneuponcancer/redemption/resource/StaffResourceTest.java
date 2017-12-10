@@ -17,6 +17,8 @@ import org.oneuponcancer.redemption.service.AuditLogService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ValidationException;
@@ -48,6 +50,9 @@ public class StaffResourceTest {
 
     @Mock
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Mock
+    private BindingResult bindingResult;
 
     @Mock
     private UsernamePasswordAuthenticationToken principal;
@@ -114,6 +119,7 @@ public class StaffResourceTest {
 
         String response = staffResource.createStaff(
                 createRequest,
+                bindingResult,
                 principal,
                 request
         );
@@ -146,6 +152,7 @@ public class StaffResourceTest {
 
         staffResource.createStaff(
                 createRequest,
+                bindingResult,
                 principal,
                 request
         );
@@ -154,8 +161,12 @@ public class StaffResourceTest {
     @Test(expected = ValidationException.class)
     public void testCreateStaffInvalidUsername() throws Exception {
         StaffCreateRequest createRequest = mock(StaffCreateRequest.class);
+        ObjectError objectError = mock(ObjectError.class);
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.CREATE_STAFF.name())));
+        when(objectError.getDefaultMessage()).thenReturn("Invalid username.");
+        when(bindingResult.hasErrors()).thenReturn(true);
+        when(bindingResult.getAllErrors()).thenReturn(Collections.singletonList(objectError));
         when(createRequest.getUsername()).thenReturn("");
         when(createRequest.getPassword()).thenReturn("secret");
         when(createRequest.getPermissions()).thenReturn(Arrays.asList(
@@ -165,6 +176,7 @@ public class StaffResourceTest {
 
         staffResource.createStaff(
                 createRequest,
+                bindingResult,
                 principal,
                 request
         );
@@ -173,8 +185,12 @@ public class StaffResourceTest {
     @Test(expected = ValidationException.class)
     public void testCreateStaffInvalidPassword() throws Exception {
         StaffCreateRequest createRequest = mock(StaffCreateRequest.class);
+        ObjectError objectError = mock(ObjectError.class);
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.CREATE_STAFF.name())));
+        when(objectError.getDefaultMessage()).thenReturn("Invalid password.");
+        when(bindingResult.hasErrors()).thenReturn(true);
+        when(bindingResult.getAllErrors()).thenReturn(Collections.singletonList(objectError));
         when(createRequest.getUsername()).thenReturn("biff");
         when(createRequest.getPassword()).thenReturn("");
         when(createRequest.getPermissions()).thenReturn(Arrays.asList(
@@ -184,6 +200,7 @@ public class StaffResourceTest {
 
         staffResource.createStaff(
                 createRequest,
+                bindingResult,
                 principal,
                 request
         );
@@ -208,6 +225,7 @@ public class StaffResourceTest {
         String response = staffResource.updateStaff(
                 id,
                 editRequest,
+                bindingResult,
                 principal,
                 request
         );
@@ -241,6 +259,7 @@ public class StaffResourceTest {
         String response = staffResource.updateStaff(
                 id,
                 editRequest,
+                bindingResult,
                 principal,
                 request
         );
@@ -274,6 +293,7 @@ public class StaffResourceTest {
         staffResource.updateStaff(
                 id,
                 editRequest,
+                bindingResult,
                 principal,
                 request
         );
@@ -295,6 +315,109 @@ public class StaffResourceTest {
         staffResource.updateStaff(
                 id,
                 editRequest,
+                bindingResult,
+                principal,
+                request
+        );
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testUpdateStaffBadUsername() throws Exception {
+        String id = "1";
+        StaffEditRequest editRequest = mock(StaffEditRequest.class);
+        Staff staff = mock(Staff.class);
+        ObjectError objectError = mock(ObjectError.class);
+
+        when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.EDIT_STAFF.name())));
+        when(objectError.getDefaultMessage()).thenReturn("Invalid username.");
+        when(bindingResult.hasErrors()).thenReturn(true);
+        when(bindingResult.getAllErrors()).thenReturn(Collections.singletonList(objectError));
+        when(staffRepository.findOne(eq(id))).thenReturn(staff);
+        when(editRequest.getUsername()).thenReturn("");
+        when(editRequest.getPassword()).thenReturn("secret");
+        when(editRequest.getPermissions()).thenReturn(Arrays.asList(
+                Permission.LOGIN.getUnique(),
+                Permission.READ_LOGS.getUnique()
+        ));
+
+        staffResource.updateStaff(
+                id,
+                editRequest,
+                bindingResult,
+                principal,
+                request
+        );
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testUpdateStaffBadPassword() throws Exception {
+        String id = "1";
+        StaffEditRequest editRequest = mock(StaffEditRequest.class);
+        Staff staff = mock(Staff.class);
+        ObjectError objectError = mock(ObjectError.class);
+
+        when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.EDIT_STAFF.name())));
+        when(objectError.getDefaultMessage()).thenReturn("Invalid password.");
+        when(bindingResult.hasErrors()).thenReturn(true);
+        when(bindingResult.getAllErrors()).thenReturn(Collections.singletonList(objectError));
+        when(staffRepository.findOne(eq(id))).thenReturn(staff);
+        when(editRequest.getUsername()).thenReturn("admin");
+        when(editRequest.getPassword()).thenReturn("");
+        when(editRequest.getPermissions()).thenReturn(Arrays.asList(
+                Permission.LOGIN.getUnique(),
+                Permission.READ_LOGS.getUnique()
+        ));
+
+        staffResource.updateStaff(
+                id,
+                editRequest,
+                bindingResult,
+                principal,
+                request
+        );
+    }
+
+    @Test
+    public void testDeleteStaff() throws Exception {
+        String id = "id";
+        Staff staff = mock(Staff.class);
+
+        when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.DELETE_STAFF.name())));
+        when(staffRepository.findOne(eq(id))).thenReturn(staff);
+
+        Staff result = staffResource.deleteStaff(
+                id,
+                principal,
+                request
+        );
+
+        assertEquals(staff, result);
+        verify(staffRepository).findOne(eq(id));
+        verify(staffRepository).delete(eq(staff));
+        verify(staffLoader).evaluateSecurity();
+        verify(auditLogService).extractRemoteIp(eq(request));
+        verify(auditLogService).log(anyString(), anyString(), anyString());
+    }
+
+    @Test(expected = InsufficientPermissionException.class)
+    public void testDeleteStaffNoPermission() throws Exception {
+        String id = "id";
+
+        staffResource.deleteStaff(
+                id,
+                principal,
+                request
+        );
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testDeleteStaffNotFound() throws Exception {
+        String id = "id";
+
+        when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.DELETE_STAFF.name())));
+
+        staffResource.deleteStaff(
+                id,
                 principal,
                 request
         );
