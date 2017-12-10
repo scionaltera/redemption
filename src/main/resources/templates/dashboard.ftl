@@ -6,7 +6,8 @@
 
     <#include "stdmeta.inc.ftl">
     <#include "stdlinks.inc.ftl">
-    <link rel="stylesheet" href="/css/dashboard.css"/>
+    <#include "internal.inc.ftl">
+    <link rel="stylesheet" href="<@spring.url '/css/dashboard.css'/>"/>
 </head>
 <body>
 <div class="container-fluid">
@@ -79,7 +80,7 @@
 </div>
 
 <#include "stdimports.inc.ftl">
-<script type="text/javascript" src="js/auditlog.js"></script>
-<script type="text/javascript" src="js/staffselect.js"></script>
+<script type="text/javascript" src="<@spring.url 'js/auditlog.js'/>"></script>
+<script type="text/javascript" src="<@spring.url 'js/staffselect.js'/>"></script>
 </body>
 </html>

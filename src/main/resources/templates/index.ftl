@@ -40,7 +40,6 @@
 </div>
 
 <#include "copyright.inc.ftl">
-
 <#include "stdimports.inc.ftl">
 </body>
 </html>

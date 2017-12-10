@@ -6,7 +6,8 @@
 
     <#include "stdmeta.inc.ftl">
     <#include "stdlinks.inc.ftl">
-    <link rel="stylesheet" href="/css/staffcreate.css"/>
+    <#include "internal.inc.ftl">
+    <link rel="stylesheet" href="<@spring.url '/css/staffcreate.css'/>"/>
 </head>
 <body>
 <div class="container-fluid">
@@ -34,6 +35,11 @@
                     <button class="btn btn-primary">Submit</button>
                 </form>
             </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+        <#include "copyright.inc.ftl">
         </div>
     </div>
 </div>

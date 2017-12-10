@@ -102,6 +102,7 @@ public class IndexResource {
             throw new InsufficientPermissionException("Not allowed to create staff accounts.");
         }
 
+        model.addAttribute("version", applicationVersion);
         model.addAttribute("permissions", Permission.values());
 
         return "staffcreate";
@@ -119,6 +120,7 @@ public class IndexResource {
             throw new IllegalArgumentException("No staff member with provided ID");
         }
 
+        model.addAttribute("version", applicationVersion);
         model.addAttribute("permissions", Permission.values());
         model.addAttribute("staff", staff);
 

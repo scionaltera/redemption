@@ -255,6 +255,7 @@ public class IndexResourceTest {
 
         assertEquals("staffcreate", result);
 
+        verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
         verify(model).addAttribute(eq("permissions"), anyCollectionOf(Permission.class));
     }
 
@@ -276,6 +277,7 @@ public class IndexResourceTest {
 
         assertEquals("staffedit", result);
 
+        verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
         verify(model).addAttribute(eq("permissions"), anyCollectionOf(Permission.class));
         verify(model).addAttribute(eq("staff"), any(Staff.class));
     }
