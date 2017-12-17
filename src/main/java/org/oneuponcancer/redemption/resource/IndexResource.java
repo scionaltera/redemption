@@ -3,8 +3,10 @@ package org.oneuponcancer.redemption.resource;
 
 import org.oneuponcancer.redemption.exception.InsufficientPermissionException;
 import org.oneuponcancer.redemption.loader.StaffLoader;
+import org.oneuponcancer.redemption.model.Asset;
 import org.oneuponcancer.redemption.model.Permission;
 import org.oneuponcancer.redemption.model.Staff;
+import org.oneuponcancer.redemption.repository.AssetRepository;
 import org.oneuponcancer.redemption.repository.StaffRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,18 +21,25 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Arrays;
+import java.util.List;
 
 @Controller
 public class IndexResource {
     private String applicationVersion;
     private StaffLoader staffLoader;
     private StaffRepository staffRepository;
+    private AssetRepository assetRepository;
 
     @Inject
-    public IndexResource(String applicationVersion, StaffLoader staffLoader, StaffRepository staffRepository) {
+    public IndexResource(String applicationVersion,
+                         StaffLoader staffLoader,
+                         StaffRepository staffRepository,
+                         AssetRepository assetRepository) {
         this.applicationVersion = applicationVersion;
         this.staffLoader = staffLoader;
         this.staffRepository = staffRepository;
+        this.assetRepository = assetRepository;
     }
 
     @RequestMapping("/")
@@ -67,30 +76,22 @@ public class IndexResource {
         model.addAttribute("version", applicationVersion);
         model.addAttribute("secure", staffLoader.isSecure());
 
+        List<Asset> assets = assetRepository.findAll();
+
+        model.addAttribute("assets", assets);
+
         Staff staff = staffRepository.findByUsername(principal.getName());
 
         model.addAttribute("staff", staff);
 
         if (staff != null) {
-            if (((UsernamePasswordAuthenticationToken)principal).getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(Permission.LIST_STAFF.name()))) {
-                model.addAttribute("liststaff", true);
-            }
+            model.addAttribute("permissions", Permission.values());
 
-            if (((UsernamePasswordAuthenticationToken)principal).getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(Permission.CREATE_STAFF.name()))) {
-                model.addAttribute("createstaff", true);
-            }
-
-            if (((UsernamePasswordAuthenticationToken)principal).getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(Permission.EDIT_STAFF.name()))) {
-                model.addAttribute("editstaff", true);
-            }
-
-            if (((UsernamePasswordAuthenticationToken)principal).getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(Permission.DELETE_STAFF.name()))) {
-                model.addAttribute("deletestaff", true);
-            }
-
-            if (((UsernamePasswordAuthenticationToken)principal).getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(Permission.READ_LOGS.name()))) {
-                model.addAttribute("readlogs", true);
-            }
+            Arrays.stream(Permission.values()).forEach(p -> {
+                if (((UsernamePasswordAuthenticationToken)principal).getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(p.name()))) {
+                    model.addAttribute(p.getUnique(), true);
+                }
+            });
         }
 
         return "dashboard";

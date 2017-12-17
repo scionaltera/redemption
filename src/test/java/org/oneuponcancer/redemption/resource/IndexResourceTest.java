@@ -8,6 +8,7 @@ import org.oneuponcancer.redemption.exception.InsufficientPermissionException;
 import org.oneuponcancer.redemption.loader.StaffLoader;
 import org.oneuponcancer.redemption.model.Permission;
 import org.oneuponcancer.redemption.model.Staff;
+import org.oneuponcancer.redemption.repository.AssetRepository;
 import org.oneuponcancer.redemption.repository.StaffRepository;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -35,6 +36,9 @@ public class IndexResourceTest {
     private StaffRepository staffRepository;
 
     @Mock
+    private AssetRepository assetRepository;
+
+    @Mock
     private Staff staff;
 
     private IndexResource indexResource;
@@ -43,7 +47,7 @@ public class IndexResourceTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        indexResource = new IndexResource(APPLICATION_VERSION, staffLoader, staffRepository);
+        indexResource = new IndexResource(APPLICATION_VERSION, staffLoader, staffRepository, assetRepository);
     }
 
     @Test
@@ -111,11 +115,11 @@ public class IndexResourceTest {
         verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
         verify(model).addAttribute(eq("secure"), anyBoolean());
         verify(model).addAttribute(eq("staff"), eq(staff));
-        verify(model).addAttribute(eq("liststaff"), eq(true));
-        verify(model).addAttribute(eq("createstaff"), eq(true));
-        verify(model).addAttribute(eq("editstaff"), eq(true));
-        verify(model).addAttribute(eq("deletestaff"), eq(true));
-        verify(model).addAttribute(eq("readlogs"), eq(true));
+        verify(model).addAttribute(eq("list-staff"), eq(true));
+        verify(model).addAttribute(eq("create-staff"), eq(true));
+        verify(model).addAttribute(eq("edit-staff"), eq(true));
+        verify(model).addAttribute(eq("delete-staff"), eq(true));
+        verify(model).addAttribute(eq("read-logs"), eq(true));
 
         assertEquals("dashboard", result);
     }
@@ -136,11 +140,11 @@ public class IndexResourceTest {
         verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
         verify(model).addAttribute(eq("secure"), anyBoolean());
         verify(model).addAttribute(eq("staff"), eq(staff));
-        verify(model, never()).addAttribute(eq("liststaff"), eq(true));
-        verify(model).addAttribute(eq("createstaff"), eq(true));
-        verify(model).addAttribute(eq("editstaff"), eq(true));
-        verify(model).addAttribute(eq("deletestaff"), eq(true));
-        verify(model).addAttribute(eq("readlogs"), eq(true));
+        verify(model, never()).addAttribute(eq("list-staff"), eq(true));
+        verify(model).addAttribute(eq("create-staff"), eq(true));
+        verify(model).addAttribute(eq("edit-staff"), eq(true));
+        verify(model).addAttribute(eq("delete-staff"), eq(true));
+        verify(model).addAttribute(eq("read-logs"), eq(true));
 
         assertEquals("dashboard", result);
     }
@@ -161,11 +165,11 @@ public class IndexResourceTest {
         verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
         verify(model).addAttribute(eq("secure"), anyBoolean());
         verify(model).addAttribute(eq("staff"), eq(staff));
-        verify(model).addAttribute(eq("liststaff"), eq(true));
-        verify(model, never()).addAttribute(eq("createstaff"), eq(true));
-        verify(model).addAttribute(eq("editstaff"), eq(true));
-        verify(model).addAttribute(eq("deletestaff"), eq(true));
-        verify(model).addAttribute(eq("readlogs"), eq(true));
+        verify(model).addAttribute(eq("list-staff"), eq(true));
+        verify(model, never()).addAttribute(eq("create-staff"), eq(true));
+        verify(model).addAttribute(eq("edit-staff"), eq(true));
+        verify(model).addAttribute(eq("delete-staff"), eq(true));
+        verify(model).addAttribute(eq("read-logs"), eq(true));
 
         assertEquals("dashboard", result);
     }
@@ -186,11 +190,11 @@ public class IndexResourceTest {
         verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
         verify(model).addAttribute(eq("secure"), anyBoolean());
         verify(model).addAttribute(eq("staff"), eq(staff));
-        verify(model).addAttribute(eq("liststaff"), eq(true));
-        verify(model).addAttribute(eq("createstaff"), eq(true));
-        verify(model, never()).addAttribute(eq("editstaff"), eq(true));
-        verify(model).addAttribute(eq("deletestaff"), eq(true));
-        verify(model).addAttribute(eq("readlogs"), eq(true));
+        verify(model).addAttribute(eq("list-staff"), eq(true));
+        verify(model).addAttribute(eq("create-staff"), eq(true));
+        verify(model, never()).addAttribute(eq("edit-staff"), eq(true));
+        verify(model).addAttribute(eq("delete-staff"), eq(true));
+        verify(model).addAttribute(eq("read-logs"), eq(true));
 
         assertEquals("dashboard", result);
     }
@@ -211,11 +215,11 @@ public class IndexResourceTest {
         verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
         verify(model).addAttribute(eq("secure"), anyBoolean());
         verify(model).addAttribute(eq("staff"), eq(staff));
-        verify(model).addAttribute(eq("liststaff"), eq(true));
-        verify(model).addAttribute(eq("createstaff"), eq(true));
-        verify(model).addAttribute(eq("editstaff"), eq(true));
-        verify(model, never()).addAttribute(eq("deletestaff"), eq(true));
-        verify(model).addAttribute(eq("readlogs"), eq(true));
+        verify(model).addAttribute(eq("list-staff"), eq(true));
+        verify(model).addAttribute(eq("create-staff"), eq(true));
+        verify(model).addAttribute(eq("edit-staff"), eq(true));
+        verify(model, never()).addAttribute(eq("delete-staff"), eq(true));
+        verify(model).addAttribute(eq("read-logs"), eq(true));
 
         assertEquals("dashboard", result);
     }
@@ -236,11 +240,11 @@ public class IndexResourceTest {
         verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
         verify(model).addAttribute(eq("secure"), anyBoolean());
         verify(model).addAttribute(eq("staff"), eq(staff));
-        verify(model).addAttribute(eq("liststaff"), eq(true));
-        verify(model).addAttribute(eq("createstaff"), eq(true));
-        verify(model).addAttribute(eq("editstaff"), eq(true));
-        verify(model).addAttribute(eq("deletestaff"), eq(true));
-        verify(model, never()).addAttribute(eq("readlogs"), eq(true));
+        verify(model).addAttribute(eq("list-staff"), eq(true));
+        verify(model).addAttribute(eq("create-staff"), eq(true));
+        verify(model).addAttribute(eq("edit-staff"), eq(true));
+        verify(model).addAttribute(eq("delete-staff"), eq(true));
+        verify(model, never()).addAttribute(eq("read-logs"), eq(true));
 
         assertEquals("dashboard", result);
     }

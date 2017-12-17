@@ -14,7 +14,7 @@
 <#if secure == false>
     <div class="row">
         <div class="col-md-12">
-            <div id="security-box-inner">
+            <div id="security-box-inner" class="box-inner">
             <span>Warning! The default staff account is enabled, which presents a security risk because it uses a
                 username and password that are publicly available on GitHub. Please either delete the account or
                 change its password before using Redemption in a production setting.</span>
@@ -24,7 +24,7 @@
 </#if>
     <div class="row">
         <div id="auth-box-outer" class="col-md-12">
-            <div id="auth-box-inner">
+            <div id="auth-box-inner" class="box-inner">
                 <form action="<@spring.url '/logout'/>" method="post">
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                     <button type="submit" class="btn btn-danger">Sign Out</button>
@@ -32,10 +32,24 @@
             </div>
         </div>
     </div>
-<#if liststaff??>
+<#if list\-asset??>
+    <div class="row">
+        <div id="asset-box-outer" class="col-md-12">
+            <div id="asset-box-inner" class="box-inner">
+                <p>Assets <button id="asset-button-create" class="btn btn-success" <#if create\-asset??><#else>disabled</#if>>Create</button></p>
+                <ul>
+                    <#list assets as asset>
+                        <li>${asset.name}</li>
+                    </#list>
+                </ul>
+            </div>
+        </div>
+    </div>
+</#if>
+<#if list\-staff??>
     <div class="row">
         <div id="perm-box-outer" class="col-md-6">
-            <div id="perm-box-inner">
+            <div id="perm-box-inner" class="box-inner">
                 <p>Permissions for ${staff.username?capitalize}</p>
                 <ul>
                     <#list staff.permissions as permission>
@@ -46,8 +60,8 @@
         </div>
 
         <div id="staff-box-outer" class="col-md-6">
-            <div id="staff-box-inner">
-                <p>Staff Editor <button id="staff-button-create" class="btn btn-success" <#if createstaff??><#else>disabled</#if>>Create</button></p>
+            <div id="staff-box-inner" class="box-inner">
+                <p>Staff Editor <button id="staff-button-create" class="btn btn-success" <#if create\-staff??><#else>disabled</#if>>Create</button></p>
                 <table id="staff-box-content" class="table">
                     <tr><th>Name</th><th>Actions</th></tr>
                 </table>
@@ -55,10 +69,10 @@
         </div>
     </div>
 </#if>
-<#if readlogs??>
+<#if read\-logs??>
     <div class="row">
         <div id="log-box-outer" class="col-md-12">
-            <div id="log-box-inner">
+            <div id="log-box-inner" class="box-inner">
                 <p>Audit Log</p>
                 <div id="log-box-content"></div>
             </div>
@@ -73,10 +87,9 @@
 </div>
 
 <div class="invisible">
-<#if liststaff??><div id="perm-list-staff"></div></#if>
-<#if createstaff??><div id="perm-create-staff"></div></#if>
-<#if editstaff??><div id="perm-edit-staff"></div></#if>
-<#if deletestaff??><div id="perm-delete-staff"></div></#if>
+<#list permissions as permission>
+    <#if permission.unique??><div id="perm-${permission.unique}"></div></#if>
+</#list>
 </div>
 
 <#include "stdimports.inc.ftl">
