@@ -6,8 +6,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.oneuponcancer.redemption.exception.InsufficientPermissionException;
 import org.oneuponcancer.redemption.loader.StaffLoader;
+import org.oneuponcancer.redemption.model.Asset;
 import org.oneuponcancer.redemption.model.Permission;
 import org.oneuponcancer.redemption.model.Staff;
+import org.oneuponcancer.redemption.repository.AssetRepository;
 import org.oneuponcancer.redemption.repository.StaffRepository;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -35,7 +37,13 @@ public class IndexResourceTest {
     private StaffRepository staffRepository;
 
     @Mock
+    private AssetRepository assetRepository;
+
+    @Mock
     private Staff staff;
+
+    @Mock
+    private Asset asset;
 
     private IndexResource indexResource;
 
@@ -43,7 +51,7 @@ public class IndexResourceTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        indexResource = new IndexResource(APPLICATION_VERSION, staffLoader, staffRepository);
+        indexResource = new IndexResource(APPLICATION_VERSION, staffLoader, staffRepository, assetRepository);
     }
 
     @Test
@@ -111,11 +119,11 @@ public class IndexResourceTest {
         verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
         verify(model).addAttribute(eq("secure"), anyBoolean());
         verify(model).addAttribute(eq("staff"), eq(staff));
-        verify(model).addAttribute(eq("liststaff"), eq(true));
-        verify(model).addAttribute(eq("createstaff"), eq(true));
-        verify(model).addAttribute(eq("editstaff"), eq(true));
-        verify(model).addAttribute(eq("deletestaff"), eq(true));
-        verify(model).addAttribute(eq("readlogs"), eq(true));
+        verify(model).addAttribute(eq("list-staff"), eq(true));
+        verify(model).addAttribute(eq("create-staff"), eq(true));
+        verify(model).addAttribute(eq("edit-staff"), eq(true));
+        verify(model).addAttribute(eq("delete-staff"), eq(true));
+        verify(model).addAttribute(eq("read-logs"), eq(true));
 
         assertEquals("dashboard", result);
     }
@@ -136,11 +144,11 @@ public class IndexResourceTest {
         verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
         verify(model).addAttribute(eq("secure"), anyBoolean());
         verify(model).addAttribute(eq("staff"), eq(staff));
-        verify(model, never()).addAttribute(eq("liststaff"), eq(true));
-        verify(model).addAttribute(eq("createstaff"), eq(true));
-        verify(model).addAttribute(eq("editstaff"), eq(true));
-        verify(model).addAttribute(eq("deletestaff"), eq(true));
-        verify(model).addAttribute(eq("readlogs"), eq(true));
+        verify(model, never()).addAttribute(eq("list-staff"), eq(true));
+        verify(model).addAttribute(eq("create-staff"), eq(true));
+        verify(model).addAttribute(eq("edit-staff"), eq(true));
+        verify(model).addAttribute(eq("delete-staff"), eq(true));
+        verify(model).addAttribute(eq("read-logs"), eq(true));
 
         assertEquals("dashboard", result);
     }
@@ -161,11 +169,11 @@ public class IndexResourceTest {
         verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
         verify(model).addAttribute(eq("secure"), anyBoolean());
         verify(model).addAttribute(eq("staff"), eq(staff));
-        verify(model).addAttribute(eq("liststaff"), eq(true));
-        verify(model, never()).addAttribute(eq("createstaff"), eq(true));
-        verify(model).addAttribute(eq("editstaff"), eq(true));
-        verify(model).addAttribute(eq("deletestaff"), eq(true));
-        verify(model).addAttribute(eq("readlogs"), eq(true));
+        verify(model).addAttribute(eq("list-staff"), eq(true));
+        verify(model, never()).addAttribute(eq("create-staff"), eq(true));
+        verify(model).addAttribute(eq("edit-staff"), eq(true));
+        verify(model).addAttribute(eq("delete-staff"), eq(true));
+        verify(model).addAttribute(eq("read-logs"), eq(true));
 
         assertEquals("dashboard", result);
     }
@@ -186,11 +194,11 @@ public class IndexResourceTest {
         verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
         verify(model).addAttribute(eq("secure"), anyBoolean());
         verify(model).addAttribute(eq("staff"), eq(staff));
-        verify(model).addAttribute(eq("liststaff"), eq(true));
-        verify(model).addAttribute(eq("createstaff"), eq(true));
-        verify(model, never()).addAttribute(eq("editstaff"), eq(true));
-        verify(model).addAttribute(eq("deletestaff"), eq(true));
-        verify(model).addAttribute(eq("readlogs"), eq(true));
+        verify(model).addAttribute(eq("list-staff"), eq(true));
+        verify(model).addAttribute(eq("create-staff"), eq(true));
+        verify(model, never()).addAttribute(eq("edit-staff"), eq(true));
+        verify(model).addAttribute(eq("delete-staff"), eq(true));
+        verify(model).addAttribute(eq("read-logs"), eq(true));
 
         assertEquals("dashboard", result);
     }
@@ -211,11 +219,11 @@ public class IndexResourceTest {
         verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
         verify(model).addAttribute(eq("secure"), anyBoolean());
         verify(model).addAttribute(eq("staff"), eq(staff));
-        verify(model).addAttribute(eq("liststaff"), eq(true));
-        verify(model).addAttribute(eq("createstaff"), eq(true));
-        verify(model).addAttribute(eq("editstaff"), eq(true));
-        verify(model, never()).addAttribute(eq("deletestaff"), eq(true));
-        verify(model).addAttribute(eq("readlogs"), eq(true));
+        verify(model).addAttribute(eq("list-staff"), eq(true));
+        verify(model).addAttribute(eq("create-staff"), eq(true));
+        verify(model).addAttribute(eq("edit-staff"), eq(true));
+        verify(model, never()).addAttribute(eq("delete-staff"), eq(true));
+        verify(model).addAttribute(eq("read-logs"), eq(true));
 
         assertEquals("dashboard", result);
     }
@@ -236,11 +244,11 @@ public class IndexResourceTest {
         verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
         verify(model).addAttribute(eq("secure"), anyBoolean());
         verify(model).addAttribute(eq("staff"), eq(staff));
-        verify(model).addAttribute(eq("liststaff"), eq(true));
-        verify(model).addAttribute(eq("createstaff"), eq(true));
-        verify(model).addAttribute(eq("editstaff"), eq(true));
-        verify(model).addAttribute(eq("deletestaff"), eq(true));
-        verify(model, never()).addAttribute(eq("readlogs"), eq(true));
+        verify(model).addAttribute(eq("list-staff"), eq(true));
+        verify(model).addAttribute(eq("create-staff"), eq(true));
+        verify(model).addAttribute(eq("edit-staff"), eq(true));
+        verify(model).addAttribute(eq("delete-staff"), eq(true));
+        verify(model, never()).addAttribute(eq("read-logs"), eq(true));
 
         assertEquals("dashboard", result);
     }
@@ -296,5 +304,58 @@ public class IndexResourceTest {
         ));
 
         indexResource.editStaff(principal, model, id);
+    }
+
+    @Test
+    public void testCreateAsset() throws Exception {
+        when(principal.getAuthorities()).thenReturn(Collections.singletonList(
+                new SimpleGrantedAuthority(Permission.CREATE_ASSET.name())
+        ));
+
+        String result = indexResource.createAsset(principal, model);
+
+        assertEquals("assetcreate", result);
+
+        verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
+        verify(model).addAttribute(eq("permissions"), anyCollectionOf(Permission.class));
+    }
+
+    @Test(expected = InsufficientPermissionException.class)
+    public void testCreateAssetNoPermission() throws Exception {
+        indexResource.createAsset(principal, model);
+    }
+
+    @Test
+    public void testEditAsset() throws Exception {
+        String id = "asset_id";
+
+        when(assetRepository.findOne(eq(id))).thenReturn(asset);
+        when(principal.getAuthorities()).thenReturn(Collections.singletonList(
+                new SimpleGrantedAuthority(Permission.EDIT_ASSET.name())
+        ));
+
+        String result = indexResource.editAsset(principal, model, id);
+
+        assertEquals("assetedit", result);
+
+        verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
+        verify(model).addAttribute(eq("permissions"), anyCollectionOf(Permission.class));
+        verify(model).addAttribute(eq("asset"), any(Asset.class));
+    }
+
+    @Test(expected = InsufficientPermissionException.class)
+    public void testEditAssetNoPermission() throws Exception {
+        indexResource.editAsset(principal, model, "asset_id");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testEditAssetNoSuchId() throws Exception {
+        String id = "bogus_asset_id";
+
+        when(principal.getAuthorities()).thenReturn(Collections.singletonList(
+                new SimpleGrantedAuthority(Permission.EDIT_ASSET.name())
+        ));
+
+        indexResource.editAsset(principal, model, id);
     }
 }

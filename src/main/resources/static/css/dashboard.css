@@ -1,48 +1,19 @@
-#security-box-inner {
-    margin: 5px;
-    padding: 5px;
-    background-color: darkred;
+.box-inner p:first-of-type {
+    font-size: x-large;
 }
 
-#staff-box-inner {
+.box-inner {
     margin: 5px;
     padding: 15px;
     background-color: #383838;
 }
 
-#staff-box-inner p:first-of-type {
-    font-size: x-large;
+#security-box-inner {
+    background-color: darkred;
 }
 
 #staff-edit-select {
     background-color: #383838;
-}
-
-#auth-box-inner {
-    margin: 5px;
-    padding: 15px;
-    background-color: #383838;
-}
-
-#perm-box-inner {
-    margin: 5px;
-    padding: 15px;
-    background-color: #383838;
-}
-
-#perm-box-inner p:first-of-type {
-    font-size: x-large;
-}
-
-#log-box-inner {
-    margin: 5px;
-    padding: 15px;
-    background-color: #383838;
-    font-size: small;
-}
-
-#log-box-inner p:first-of-type {
-    font-size: x-large;
 }
 
 #log-box-items {
