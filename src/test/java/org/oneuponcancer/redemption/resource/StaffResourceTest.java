@@ -73,6 +73,13 @@ public class StaffResourceTest {
         }
 
         when(staffRepository.findAll()).thenReturn(allStaff);
+        when(staffRepository.save(any(Staff.class))).thenAnswer(i -> {
+            Staff staff = i.getArgumentAt(0, Staff.class);
+
+            staff.setId(UUID.randomUUID().toString());
+
+            return staff;
+        });
 
         staffResource = new StaffResource(
                 staffRepository,
@@ -109,22 +116,15 @@ public class StaffResourceTest {
                 Permission.LOGIN.getUnique(),
                 Permission.READ_LOGS.getUnique()
         ));
-        when(staffRepository.save(any(Staff.class))).thenAnswer(i -> {
-            Staff staff = (Staff)i.getArguments()[0];
 
-            staff.setId(UUID.randomUUID().toString());
-
-            return staff;
-        });
-
-        String response = staffResource.createStaff(
+        Staff response = staffResource.createStaff(
                 createRequest,
                 bindingResult,
                 principal,
                 request
         );
 
-        assertEquals("redirect:/dashboard", response);
+        assertNotNull(response);
         verify(bCryptPasswordEncoder).encode(eq("secret"));
         verify(staffRepository).save(staffArgumentCaptor.capture());
         verify(staffLoader).evaluateSecurity();
@@ -222,7 +222,7 @@ public class StaffResourceTest {
                 Permission.READ_LOGS.getUnique()
         ));
 
-        String response = staffResource.updateStaff(
+        Staff response = staffResource.updateStaff(
                 id,
                 editRequest,
                 bindingResult,
@@ -230,7 +230,7 @@ public class StaffResourceTest {
                 request
         );
 
-        assertEquals("redirect:/dashboard", response);
+        assertNotNull(response);
         verify(staff).setUsername(eq("admin"));
         verify(staff).setPassword(eq("encrypted"));
         verify(staff, times(Permission.values().length)).removePermission(any(Permission.class));
@@ -256,7 +256,7 @@ public class StaffResourceTest {
                 Permission.READ_LOGS.getUnique()
         ));
 
-        String response = staffResource.updateStaff(
+        Staff response = staffResource.updateStaff(
                 id,
                 editRequest,
                 bindingResult,
@@ -264,7 +264,7 @@ public class StaffResourceTest {
                 request
         );
 
-        assertEquals("redirect:/dashboard", response);
+        assertNotNull(response);
         verify(staff).setUsername(eq("admin"));
         verify(staff, never()).setPassword(anyString());
         verify(staff, times(Permission.values().length)).removePermission(any(Permission.class));
