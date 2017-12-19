@@ -14,6 +14,7 @@
     <div class="row">
         <div class="col-md-12">
             <div id="staff-edit-form">
+                <h1>Edit Staff</h1>
                 <form action="<@spring.url '/api/v1/staff/${staff.id}'/>" method="post">
                     <div id="error-box" class="form-group invisible">
                         <p class="text-danger"></p>

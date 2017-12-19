@@ -37,11 +37,9 @@
         <div id="asset-box-outer" class="col-md-12">
             <div id="asset-box-inner" class="box-inner">
                 <p>Assets <button id="asset-button-create" class="btn btn-success" <#if create\-asset??><#else>disabled</#if>>Create</button></p>
-                <ul>
-                    <#list assets as asset>
-                        <li>${asset.name}</li>
-                    </#list>
-                </ul>
+                <table id="asset-box-content" class="table">
+                    <tr><th>Name</th><th>ID</th><th>Actions</th></tr>
+                </table>
             </div>
         </div>
     </div>
@@ -88,12 +86,13 @@
 
 <div class="invisible">
 <#list permissions as permission>
-    <#if permission.unique??><div id="perm-${permission.unique}"></div></#if>
+    <div id="perm-${permission}"></div>
 </#list>
 </div>
 
 <#include "stdimports.inc.ftl">
 <script type="text/javascript" src="<@spring.url 'js/auditlog.js'/>"></script>
-<script type="text/javascript" src="<@spring.url 'js/staffselect.js'/>"></script>
+<script type="text/javascript" src="<@spring.url 'js/staffdashboard.js'/>"></script>
+<script type="text/javascript" src="<@spring.url 'js/assetdashboard.js'/>"></script>
 </body>
 </html>

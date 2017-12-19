@@ -8,6 +8,8 @@ import org.oneuponcancer.redemption.model.Permission;
 import org.oneuponcancer.redemption.model.Staff;
 import org.oneuponcancer.redemption.repository.AssetRepository;
 import org.oneuponcancer.redemption.repository.StaffRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Controller;
@@ -21,11 +23,14 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 @Controller
 public class IndexResource {
+    private static final Logger LOGGER = LoggerFactory.getLogger(IndexResource.class);
+
     private String applicationVersion;
     private StaffLoader staffLoader;
     private StaffRepository staffRepository;
@@ -76,22 +81,22 @@ public class IndexResource {
         model.addAttribute("version", applicationVersion);
         model.addAttribute("secure", staffLoader.isSecure());
 
-        List<Asset> assets = assetRepository.findAll();
-
-        model.addAttribute("assets", assets);
-
         Staff staff = staffRepository.findByUsername(principal.getName());
 
         model.addAttribute("staff", staff);
 
         if (staff != null) {
-            model.addAttribute("permissions", Permission.values());
+            List<String> activePermissions = new ArrayList<>();
 
             Arrays.stream(Permission.values()).forEach(p -> {
                 if (((UsernamePasswordAuthenticationToken)principal).getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(p.name()))) {
+
                     model.addAttribute(p.getUnique(), true);
+                    activePermissions.add(p.getUnique());
                 }
             });
+
+            model.addAttribute("permissions", activePermissions);
         }
 
         return "dashboard";
@@ -126,6 +131,37 @@ public class IndexResource {
         model.addAttribute("staff", staff);
 
         return "staffedit";
+    }
+
+    @RequestMapping("/asset")
+    public String createAsset(Principal principal, Model model) {
+        if (((UsernamePasswordAuthenticationToken)principal).getAuthorities().stream().noneMatch(a -> a.getAuthority().equals(Permission.CREATE_ASSET.name()))) {
+            throw new InsufficientPermissionException("Not allowed to create assets.");
+        }
+
+        model.addAttribute("version", applicationVersion);
+        model.addAttribute("permissions", Permission.values());
+
+        return "assetcreate";
+    }
+
+    @RequestMapping("/asset/{id}")
+    public String editAsset(Principal principal, Model model, @PathVariable String id) {
+        if (((UsernamePasswordAuthenticationToken)principal).getAuthorities().stream().noneMatch(a -> a.getAuthority().equals(Permission.EDIT_ASSET.name()))) {
+            throw new InsufficientPermissionException("Not allowed to list assets.");
+        }
+
+        Asset asset = assetRepository.findOne(id);
+
+        if (asset == null) {
+            throw new IllegalArgumentException("No asset with provided ID");
+        }
+
+        model.addAttribute("version", applicationVersion);
+        model.addAttribute("permissions", Permission.values());
+        model.addAttribute("asset", asset);
+
+        return "assetedit";
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

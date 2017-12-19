@@ -6,6 +6,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.oneuponcancer.redemption.exception.InsufficientPermissionException;
 import org.oneuponcancer.redemption.loader.StaffLoader;
+import org.oneuponcancer.redemption.model.Asset;
 import org.oneuponcancer.redemption.model.Permission;
 import org.oneuponcancer.redemption.model.Staff;
 import org.oneuponcancer.redemption.repository.AssetRepository;
@@ -40,6 +41,9 @@ public class IndexResourceTest {
 
     @Mock
     private Staff staff;
+
+    @Mock
+    private Asset asset;
 
     private IndexResource indexResource;
 
@@ -300,5 +304,58 @@ public class IndexResourceTest {
         ));
 
         indexResource.editStaff(principal, model, id);
+    }
+
+    @Test
+    public void testCreateAsset() throws Exception {
+        when(principal.getAuthorities()).thenReturn(Collections.singletonList(
+                new SimpleGrantedAuthority(Permission.CREATE_ASSET.name())
+        ));
+
+        String result = indexResource.createAsset(principal, model);
+
+        assertEquals("assetcreate", result);
+
+        verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
+        verify(model).addAttribute(eq("permissions"), anyCollectionOf(Permission.class));
+    }
+
+    @Test(expected = InsufficientPermissionException.class)
+    public void testCreateAssetNoPermission() throws Exception {
+        indexResource.createAsset(principal, model);
+    }
+
+    @Test
+    public void testEditAsset() throws Exception {
+        String id = "asset_id";
+
+        when(assetRepository.findOne(eq(id))).thenReturn(asset);
+        when(principal.getAuthorities()).thenReturn(Collections.singletonList(
+                new SimpleGrantedAuthority(Permission.EDIT_ASSET.name())
+        ));
+
+        String result = indexResource.editAsset(principal, model, id);
+
+        assertEquals("assetedit", result);
+
+        verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
+        verify(model).addAttribute(eq("permissions"), anyCollectionOf(Permission.class));
+        verify(model).addAttribute(eq("asset"), any(Asset.class));
+    }
+
+    @Test(expected = InsufficientPermissionException.class)
+    public void testEditAssetNoPermission() throws Exception {
+        indexResource.editAsset(principal, model, "asset_id");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testEditAssetNoSuchId() throws Exception {
+        String id = "bogus_asset_id";
+
+        when(principal.getAuthorities()).thenReturn(Collections.singletonList(
+                new SimpleGrantedAuthority(Permission.EDIT_ASSET.name())
+        ));
+
+        indexResource.editAsset(principal, model, id);
     }
 }
