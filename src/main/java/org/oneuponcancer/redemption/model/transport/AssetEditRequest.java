@@ -1,12 +1,12 @@
 package org.oneuponcancer.redemption.model.transport;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 public class AssetEditRequest {
-    @NotNull
+    @Size(min = 3, message = "Names must be at least 3 letters long.")
     private String name;
 
-    @NotNull
+    @Size(min = 3, message = "Descriptions must be at least 3 letters long.")
     private String description;
 
     public String getName() {
