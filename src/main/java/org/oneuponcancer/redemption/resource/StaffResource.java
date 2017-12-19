@@ -67,7 +67,8 @@ public class StaffResource {
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public String createStaff(@Valid StaffCreateRequest staffCreateRequest, BindingResult bindingResult, Principal principal, HttpServletRequest request) {
+    @ResponseBody
+    public Staff createStaff(@Valid StaffCreateRequest staffCreateRequest, BindingResult bindingResult, Principal principal, HttpServletRequest request) {
         if (((UsernamePasswordAuthenticationToken)principal).getAuthorities().stream().noneMatch(a -> a.getAuthority().equals(Permission.CREATE_STAFF.name()))) {
             throw new InsufficientPermissionException("Not allowed to create staff accounts.");
         }
@@ -97,11 +98,12 @@ public class StaffResource {
                         savedStaff.getUsername(),
                         savedStaff.getId()));
 
-        return "redirect:/dashboard";
+        return savedStaff;
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.POST)
-    public String updateStaff(@PathVariable String id, @Valid StaffEditRequest staffEditRequest, BindingResult bindingResult, Principal principal, HttpServletRequest request) {
+    @ResponseBody
+    public Staff updateStaff(@PathVariable String id, @Valid StaffEditRequest staffEditRequest, BindingResult bindingResult, Principal principal, HttpServletRequest request) {
         if (((UsernamePasswordAuthenticationToken)principal).getAuthorities().stream().noneMatch(a -> a.getAuthority().equals(Permission.EDIT_STAFF.name()))) {
             throw new InsufficientPermissionException("Not allowed to edit staff accounts.");
         }
@@ -130,7 +132,7 @@ public class StaffResource {
             staff.setPassword(bCryptPasswordEncoder.encode(staffEditRequest.getPassword()));
         }
 
-        staffRepository.save(staff);
+        Staff savedStaff = staffRepository.save(staff);
         staffLoader.evaluateSecurity();
 
         auditLogService.log(
@@ -140,7 +142,7 @@ public class StaffResource {
                         staff.getUsername(),
                         staff.getId()));
 
-        return "redirect:/dashboard";
+        return savedStaff;
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
