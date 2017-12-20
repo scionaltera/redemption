@@ -3,6 +3,10 @@ package org.oneuponcancer.redemption.model;
 public enum Permission {
     LOGIN("login", "Can log in"),
     READ_LOGS("read-logs", "Can read logs"),
+    CREATE_PARTICIPANT("create-participant", "Can create participants"),
+    LIST_PARTICIPANT("list-participant", "Can list participants"),
+    EDIT_PARTICIPANT("edit-participant", "Can edit participants"),
+    DELETE_PARTICIPANT("delete-participant", "Can delete participants"),
     CREATE_STAFF("create-staff", "Can create staff accounts"),
     LIST_STAFF("list-staff", "Can list staff accounts"),
     EDIT_STAFF("edit-staff", "Can edit staff accounts"),

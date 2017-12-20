@@ -4,9 +4,11 @@ package org.oneuponcancer.redemption.resource;
 import org.oneuponcancer.redemption.exception.InsufficientPermissionException;
 import org.oneuponcancer.redemption.loader.StaffLoader;
 import org.oneuponcancer.redemption.model.Asset;
+import org.oneuponcancer.redemption.model.Participant;
 import org.oneuponcancer.redemption.model.Permission;
 import org.oneuponcancer.redemption.model.Staff;
 import org.oneuponcancer.redemption.repository.AssetRepository;
+import org.oneuponcancer.redemption.repository.ParticipantRepository;
 import org.oneuponcancer.redemption.repository.StaffRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,16 +37,19 @@ public class IndexResource {
     private StaffLoader staffLoader;
     private StaffRepository staffRepository;
     private AssetRepository assetRepository;
+    private ParticipantRepository participantRepository;
 
     @Inject
     public IndexResource(String applicationVersion,
                          StaffLoader staffLoader,
                          StaffRepository staffRepository,
-                         AssetRepository assetRepository) {
+                         AssetRepository assetRepository,
+                         ParticipantRepository participantRepository) {
         this.applicationVersion = applicationVersion;
         this.staffLoader = staffLoader;
         this.staffRepository = staffRepository;
         this.assetRepository = assetRepository;
+        this.participantRepository = participantRepository;
     }
 
     @RequestMapping("/")
@@ -162,6 +167,37 @@ public class IndexResource {
         model.addAttribute("asset", asset);
 
         return "assetedit";
+    }
+
+    @RequestMapping("/participant")
+    public String createParticipant(Principal principal, Model model) {
+        if (((UsernamePasswordAuthenticationToken)principal).getAuthorities().stream().noneMatch(a -> a.getAuthority().equals(Permission.CREATE_PARTICIPANT.name()))) {
+            throw new InsufficientPermissionException("Not allowed to create participants.");
+        }
+
+        model.addAttribute("version", applicationVersion);
+        model.addAttribute("permissions", Permission.values());
+
+        return "participantcreate";
+    }
+
+    @RequestMapping("/participant/{id}")
+    public String editParticipant(Principal principal, Model model, @PathVariable String id) {
+        if (((UsernamePasswordAuthenticationToken)principal).getAuthorities().stream().noneMatch(a -> a.getAuthority().equals(Permission.EDIT_PARTICIPANT.name()))) {
+            throw new InsufficientPermissionException("Not allowed to list participants.");
+        }
+
+        Participant participant = participantRepository.findOne(id);
+
+        if (participant == null) {
+            throw new IllegalArgumentException("No participant with provided ID");
+        }
+
+        model.addAttribute("version", applicationVersion);
+        model.addAttribute("permissions", Permission.values());
+        model.addAttribute("participant", participant);
+
+        return "participantedit";
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
