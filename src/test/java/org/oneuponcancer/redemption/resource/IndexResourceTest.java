@@ -7,9 +7,11 @@ import org.mockito.MockitoAnnotations;
 import org.oneuponcancer.redemption.exception.InsufficientPermissionException;
 import org.oneuponcancer.redemption.loader.StaffLoader;
 import org.oneuponcancer.redemption.model.Asset;
+import org.oneuponcancer.redemption.model.Participant;
 import org.oneuponcancer.redemption.model.Permission;
 import org.oneuponcancer.redemption.model.Staff;
 import org.oneuponcancer.redemption.repository.AssetRepository;
+import org.oneuponcancer.redemption.repository.ParticipantRepository;
 import org.oneuponcancer.redemption.repository.StaffRepository;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -40,10 +42,16 @@ public class IndexResourceTest {
     private AssetRepository assetRepository;
 
     @Mock
+    private ParticipantRepository participantRepository;
+
+    @Mock
     private Staff staff;
 
     @Mock
     private Asset asset;
+
+    @Mock
+    private Participant participant;
 
     private IndexResource indexResource;
 
@@ -51,7 +59,12 @@ public class IndexResourceTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        indexResource = new IndexResource(APPLICATION_VERSION, staffLoader, staffRepository, assetRepository);
+        indexResource = new IndexResource(
+                APPLICATION_VERSION,
+                staffLoader,
+                staffRepository,
+                assetRepository,
+                participantRepository);
     }
 
     @Test
@@ -357,5 +370,58 @@ public class IndexResourceTest {
         ));
 
         indexResource.editAsset(principal, model, id);
+    }
+
+    @Test
+    public void testCreateParticipant() throws Exception {
+        when(principal.getAuthorities()).thenReturn(Collections.singletonList(
+                new SimpleGrantedAuthority(Permission.CREATE_PARTICIPANT.name())
+        ));
+
+        String result = indexResource.createParticipant(principal, model);
+
+        assertEquals("participantcreate", result);
+
+        verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
+        verify(model).addAttribute(eq("permissions"), anyCollectionOf(Permission.class));
+    }
+
+    @Test(expected = InsufficientPermissionException.class)
+    public void testCreateParticipantNoPermission() throws Exception {
+        indexResource.createParticipant(principal, model);
+    }
+
+    @Test
+    public void testEditParticipant() throws Exception {
+        String id = "participant_id";
+
+        when(participantRepository.findOne(eq(id))).thenReturn(participant);
+        when(principal.getAuthorities()).thenReturn(Collections.singletonList(
+                new SimpleGrantedAuthority(Permission.EDIT_PARTICIPANT.name())
+        ));
+
+        String result = indexResource.editParticipant(principal, model, id);
+
+        assertEquals("participantedit", result);
+
+        verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
+        verify(model).addAttribute(eq("permissions"), anyCollectionOf(Permission.class));
+        verify(model).addAttribute(eq("participant"), any(Participant.class));
+    }
+
+    @Test(expected = InsufficientPermissionException.class)
+    public void testEditParticipantNoPermission() throws Exception {
+        indexResource.editParticipant(principal, model, "participant_id");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testEditParticipantNoSuchId() throws Exception {
+        String id = "bogus_participant_id";
+
+        when(principal.getAuthorities()).thenReturn(Collections.singletonList(
+                new SimpleGrantedAuthority(Permission.EDIT_PARTICIPANT.name())
+        ));
+
+        indexResource.editParticipant(principal, model, id);
     }
 }

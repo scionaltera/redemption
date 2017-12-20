@@ -32,6 +32,18 @@
             </div>
         </div>
     </div>
+<#if list\-participant??>
+    <div class="row">
+        <div id="participant-box-outer" class="col-md-12">
+            <div id="participant-box-inner" class="box-inner">
+                <p>Participants <button id="participant-button-create" class="btn btn-success" <#if create\-participant??><#else>disabled</#if>>Create</button></p>
+                <table id="participant-box-content" class="table">
+                    <tr><th>First Name</th><th>Last Name</th><th>Email</th><th>Actions</th></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</#if>
 <#if list\-asset??>
     <div class="row">
         <div id="asset-box-outer" class="col-md-12">
@@ -92,6 +104,7 @@
 
 <#include "stdimports.inc.ftl">
 <script type="text/javascript" src="<@spring.url 'js/auditlog.js'/>"></script>
+<script type="text/javascript" src="<@spring.url 'js/participantdashboard.js'/>"></script>
 <script type="text/javascript" src="<@spring.url 'js/staffdashboard.js'/>"></script>
 <script type="text/javascript" src="<@spring.url 'js/assetdashboard.js'/>"></script>
 </body>
