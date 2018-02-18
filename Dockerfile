@@ -10,10 +10,11 @@ RUN cd /opt/build \
 && apk update \
 && apk upgrade \
 && apk add --no-cache bash \
-&& ./gradlew clean build -x check
+&& apk add libstdc++ \
+&& ./gradlew clean build
 
 FROM frolvlad/alpine-oraclejre8:slim as run
 MAINTAINER Peter Keeler <peter@bonevm.com>
 EXPOSE 8080
 COPY --from=build /opt/build/build/libs/redemption-*.jar /opt/app/app.jar
-CMD ["/usr/bin/java", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005","-jar","/opt/app/app.jar"]
+CMD ["/usr/bin/java", "-jar","/opt/app/app.jar"]
