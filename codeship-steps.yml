@@ -1,0 +1,13 @@
+- name: tag_latest
+  service: redemption
+  type: push
+  tag: master
+  image_name: scionaltera/redemption
+  encrypted_dockercfg_path: dockercfg.encrypted
+- name: tag_release
+  service: redemption
+  type: push
+  tag: ^(v[0-9.]+)$
+  image_name: scionaltera/redemption
+  image_tag: "{{ .Branch }}"
+  encrypted_dockercfg_path: dockercfg.encrypted
