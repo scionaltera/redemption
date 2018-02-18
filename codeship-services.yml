@@ -1,0 +1,4 @@
+redemption:
+  build:
+    image: scionaltera/redemption
+    dockerfile: Dockerfile
