@@ -14,7 +14,7 @@ services:
     ports:
      - "27017"
   redemption:
-    image: org.oneuponcancer/redemption:latest
+    image: scionaltera/redemption:latest
     ports:
      - "8080:8080"
      - "5005:5005"
