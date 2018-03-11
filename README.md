@@ -1,5 +1,5 @@
 # Redemption
-[![Website](https://img.shields.io/website/https/redemption.bonevm.com.svg?label=game "Website")](https://redemption.bonevm.com)
+[![Website](https://img.shields.io/website/https/redemption.bonevm.com.svg?label=website "Website")](https://redemption.bonevm.com)
 [![Codeship Status for scionaltera/redemption](https://img.shields.io/codeship/d9773320-5bde-0135-1e8a-762f064b5c19/master.svg)](https://codeship.com/projects/237681)  
 ## Introduction
 Redemption is a platform for the folks at [1UpOnCancer](https://1uponcancer.org) to use to manage the competitions and giveaways they do. They have to manage a lot of Steam keys and other prizes, participants and events and needed a database to help with that. I have decided to make it an open source project in case there are other organizations that need a similar way to organize their contest assets.
