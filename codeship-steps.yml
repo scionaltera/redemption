@@ -1,3 +1,6 @@
+- name: build
+  service: redemption
+  command: echo "Build complete!"
 - name: tag_latest
   service: redemption
   type: push
