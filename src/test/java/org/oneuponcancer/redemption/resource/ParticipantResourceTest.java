@@ -54,7 +54,7 @@ public class ParticipantResourceTest {
     private ParticipantResource participantResource;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
 
         for (int i = 0; i < 3; i++) {
@@ -76,7 +76,7 @@ public class ParticipantResourceTest {
     }
 
     @Test
-    public void testFetchParticipant() throws Exception {
+    public void testFetchParticipant() {
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.LIST_PARTICIPANT.name())));
 
         List<Participant> result = participantResource.fetchParticipant(principal);
@@ -85,12 +85,12 @@ public class ParticipantResourceTest {
     }
 
     @Test(expected = InsufficientPermissionException.class)
-    public void testFetchParticipantNoPermission() throws Exception {
+    public void testFetchParticipantNoPermission() {
         participantResource.fetchParticipant(principal);
     }
 
     @Test
-    public void testCreateParticipant() throws Exception {
+    public void testCreateParticipant() {
         ParticipantCreateRequest createRequest = mock(ParticipantCreateRequest.class);
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.CREATE_PARTICIPANT.name())));
@@ -119,7 +119,7 @@ public class ParticipantResourceTest {
     }
 
     @Test(expected = InsufficientPermissionException.class)
-    public void testCreateParticipantNoPermission() throws Exception {
+    public void testCreateParticipantNoPermission() {
         ParticipantCreateRequest createRequest = mock(ParticipantCreateRequest.class);
 
         when(createRequest.getFirstName()).thenReturn("First");
@@ -135,7 +135,7 @@ public class ParticipantResourceTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testCreateParticipantInvalidName() throws Exception {
+    public void testCreateParticipantInvalidName() {
         ParticipantCreateRequest createRequest = mock(ParticipantCreateRequest.class);
         ObjectError objectError = mock(ObjectError.class);
 
@@ -156,7 +156,7 @@ public class ParticipantResourceTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testCreateParticipantInvalidDescription() throws Exception {
+    public void testCreateParticipantInvalidDescription() {
         ParticipantCreateRequest createRequest = mock(ParticipantCreateRequest.class);
         ObjectError objectError = mock(ObjectError.class);
 
@@ -177,19 +177,19 @@ public class ParticipantResourceTest {
     }
 
     @Test
-    public void testUpdateParticipant() throws Exception {
-        String id = "1";
+    public void testUpdateParticipant() {
+        UUID uuid = UUID.randomUUID();
         ParticipantEditRequest editRequest = mock(ParticipantEditRequest.class);
         Participant participant = mock(Participant.class);
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.EDIT_PARTICIPANT.name())));
-        when(participantRepository.findOne(eq(id))).thenReturn(participant);
+        when(participantRepository.findOne(eq(uuid))).thenReturn(participant);
         when(editRequest.getFirstName()).thenReturn("First");
         when(editRequest.getLastName()).thenReturn("Lasterson");
         when(editRequest.getEmail()).thenReturn("first@lasterson.com");
 
         Participant response = participantResource.updateParticipant(
-                id,
+                uuid.toString(),
                 editRequest,
                 bindingResult,
                 principal,
@@ -206,18 +206,18 @@ public class ParticipantResourceTest {
     }
 
     @Test(expected = InsufficientPermissionException.class)
-    public void testUpdateParticipantNoPermission() throws Exception {
-        String id = "1";
+    public void testUpdateParticipantNoPermission() {
+        UUID uuid = UUID.randomUUID();
         ParticipantEditRequest editRequest = mock(ParticipantEditRequest.class);
         Participant participant = mock(Participant.class);
 
-        when(participantRepository.findOne(eq(id))).thenReturn(participant);
+        when(participantRepository.findOne(eq(uuid))).thenReturn(participant);
         when(editRequest.getFirstName()).thenReturn("First");
         when(editRequest.getLastName()).thenReturn("Lasterson");
         when(editRequest.getEmail()).thenReturn("first@lasterson.com");
 
         participantResource.updateParticipant(
-                id,
+                uuid.toString(),
                 editRequest,
                 bindingResult,
                 principal,
@@ -226,7 +226,7 @@ public class ParticipantResourceTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void testUpdateParticipantNotFound() throws Exception {
+    public void testUpdateParticipantNotFound() {
         String id = "1";
         ParticipantEditRequest editRequest = mock(ParticipantEditRequest.class);
 
@@ -245,8 +245,8 @@ public class ParticipantResourceTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testUpdateParticipantBadName() throws Exception {
-        String id = "1";
+    public void testUpdateParticipantBadName() {
+        UUID uuid = UUID.randomUUID();
         ParticipantEditRequest editRequest = mock(ParticipantEditRequest.class);
         Participant participant = mock(Participant.class);
         ObjectError objectError = mock(ObjectError.class);
@@ -255,13 +255,13 @@ public class ParticipantResourceTest {
         when(objectError.getDefaultMessage()).thenReturn("Invalid name.");
         when(bindingResult.hasErrors()).thenReturn(true);
         when(bindingResult.getAllErrors()).thenReturn(Collections.singletonList(objectError));
-        when(participantRepository.findOne(eq(id))).thenReturn(participant);
+        when(participantRepository.findOne(eq(uuid))).thenReturn(participant);
         when(editRequest.getFirstName()).thenReturn("First");
         when(editRequest.getLastName()).thenReturn("Lasterson");
         when(editRequest.getEmail()).thenReturn("first@lasterson.com");
 
         participantResource.updateParticipant(
-                id,
+                uuid.toString(),
                 editRequest,
                 bindingResult,
                 principal,
@@ -270,8 +270,8 @@ public class ParticipantResourceTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testUpdateParticipantBadDescription() throws Exception {
-        String id = "1";
+    public void testUpdateParticipantBadDescription() {
+        UUID uuid = UUID.randomUUID();
         ParticipantEditRequest editRequest = mock(ParticipantEditRequest.class);
         Participant participant = mock(Participant.class);
         ObjectError objectError = mock(ObjectError.class);
@@ -280,13 +280,13 @@ public class ParticipantResourceTest {
         when(objectError.getDefaultMessage()).thenReturn("Invalid description.");
         when(bindingResult.hasErrors()).thenReturn(true);
         when(bindingResult.getAllErrors()).thenReturn(Collections.singletonList(objectError));
-        when(participantRepository.findOne(eq(id))).thenReturn(participant);
+        when(participantRepository.findOne(eq(uuid))).thenReturn(participant);
         when(editRequest.getFirstName()).thenReturn("First");
         when(editRequest.getLastName()).thenReturn("Lasterson");
         when(editRequest.getEmail()).thenReturn("first@lasterson.com");
 
         participantResource.updateParticipant(
-                id,
+                uuid.toString(),
                 editRequest,
                 bindingResult,
                 principal,
@@ -295,28 +295,28 @@ public class ParticipantResourceTest {
     }
 
     @Test
-    public void testDeleteParticipant() throws Exception {
-        String id = "id";
+    public void testDeleteParticipant() {
+        UUID uuid = UUID.randomUUID();
         Participant participant = mock(Participant.class);
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.DELETE_PARTICIPANT.name())));
-        when(participantRepository.findOne(eq(id))).thenReturn(participant);
+        when(participantRepository.findOne(eq(uuid))).thenReturn(participant);
 
         Participant result = participantResource.deleteParticipant(
-                id,
+                uuid.toString(),
                 principal,
                 request
         );
 
         assertEquals(participant, result);
-        verify(participantRepository).findOne(eq(id));
+        verify(participantRepository).findOne(eq(uuid));
         verify(participantRepository).delete(eq(participant));
         verify(auditLogService).extractRemoteIp(eq(request));
         verify(auditLogService).log(anyString(), anyString(), anyString());
     }
 
     @Test(expected = InsufficientPermissionException.class)
-    public void testDeleteParticipantNoPermission() throws Exception {
+    public void testDeleteParticipantNoPermission() {
         String id = "id";
 
         participantResource.deleteParticipant(
@@ -327,7 +327,7 @@ public class ParticipantResourceTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void testDeleteParticipantNotFound() throws Exception {
+    public void testDeleteParticipantNotFound() {
         String id = "id";
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.DELETE_PARTICIPANT.name())));

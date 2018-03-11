@@ -1,11 +1,16 @@
 package org.oneuponcancer.redemption.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import org.hibernate.annotations.Type;
 
-@Document
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+@Entity
 public class Participant {
     @Id
+    @GeneratedValue
+    @Type(type = "pg-uuid")
     private String id;
 
     private String firstName;

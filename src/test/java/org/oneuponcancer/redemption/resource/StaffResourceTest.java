@@ -65,7 +65,7 @@ public class StaffResourceTest {
     private StaffResource staffResource;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
 
         for (int i = 0; i < 3; i++) {
@@ -89,7 +89,7 @@ public class StaffResourceTest {
     }
 
     @Test
-    public void testFetchStaff() throws Exception {
+    public void testFetchStaff() {
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.LIST_STAFF.name())));
 
         List<Staff> result = staffResource.fetchStaff(principal);
@@ -100,12 +100,12 @@ public class StaffResourceTest {
     }
 
     @Test(expected = InsufficientPermissionException.class)
-    public void testFetchStaffNoPermission() throws Exception {
+    public void testFetchStaffNoPermission() {
         staffResource.fetchStaff(principal);
     }
 
     @Test
-    public void testCreateStaff() throws Exception {
+    public void testCreateStaff() {
         StaffCreateRequest createRequest = mock(StaffCreateRequest.class);
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.CREATE_STAFF.name())));
@@ -140,7 +140,7 @@ public class StaffResourceTest {
     }
 
     @Test(expected = InsufficientPermissionException.class)
-    public void testCreateStaffNoPermission() throws Exception {
+    public void testCreateStaffNoPermission() {
         StaffCreateRequest createRequest = mock(StaffCreateRequest.class);
 
         when(createRequest.getUsername()).thenReturn("biff");
@@ -159,7 +159,7 @@ public class StaffResourceTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testCreateStaffInvalidUsername() throws Exception {
+    public void testCreateStaffInvalidUsername() {
         StaffCreateRequest createRequest = mock(StaffCreateRequest.class);
         ObjectError objectError = mock(ObjectError.class);
 
@@ -183,7 +183,7 @@ public class StaffResourceTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testCreateStaffInvalidPassword() throws Exception {
+    public void testCreateStaffInvalidPassword() {
         StaffCreateRequest createRequest = mock(StaffCreateRequest.class);
         ObjectError objectError = mock(ObjectError.class);
 
@@ -207,14 +207,14 @@ public class StaffResourceTest {
     }
 
     @Test
-    public void testUpdateStaff() throws Exception {
-        String id = "1";
+    public void testUpdateStaff() {
+        UUID uuid = UUID.randomUUID();
         StaffEditRequest editRequest = mock(StaffEditRequest.class);
         Staff staff = mock(Staff.class);
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.EDIT_STAFF.name())));
         when(bCryptPasswordEncoder.encode(eq("secret"))).thenReturn("encrypted");
-        when(staffRepository.findOne(eq(id))).thenReturn(staff);
+        when(staffRepository.findOne(eq(uuid))).thenReturn(staff);
         when(editRequest.getUsername()).thenReturn("admin");
         when(editRequest.getPassword()).thenReturn("secret");
         when(editRequest.getPermissions()).thenReturn(Arrays.asList(
@@ -223,7 +223,7 @@ public class StaffResourceTest {
         ));
 
         Staff response = staffResource.updateStaff(
-                id,
+                uuid.toString(),
                 editRequest,
                 bindingResult,
                 principal,
@@ -243,13 +243,13 @@ public class StaffResourceTest {
     }
 
     @Test
-    public void testUpdateStaffNoPasswordChange() throws Exception {
-        String id = "1";
+    public void testUpdateStaffNoPasswordChange() {
+        UUID uuid = UUID.randomUUID();
         StaffEditRequest editRequest = mock(StaffEditRequest.class);
         Staff staff = mock(Staff.class);
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.EDIT_STAFF.name())));
-        when(staffRepository.findOne(eq(id))).thenReturn(staff);
+        when(staffRepository.findOne(eq(uuid))).thenReturn(staff);
         when(editRequest.getUsername()).thenReturn("admin");
         when(editRequest.getPermissions()).thenReturn(Arrays.asList(
                 Permission.LOGIN.getUnique(),
@@ -257,7 +257,7 @@ public class StaffResourceTest {
         ));
 
         Staff response = staffResource.updateStaff(
-                id,
+                uuid.toString(),
                 editRequest,
                 bindingResult,
                 principal,
@@ -277,12 +277,12 @@ public class StaffResourceTest {
     }
 
     @Test(expected = InsufficientPermissionException.class)
-    public void testUpdateStaffNoPermission() throws Exception {
-        String id = "1";
+    public void testUpdateStaffNoPermission() {
+        UUID uuid = UUID.randomUUID();
         StaffEditRequest editRequest = mock(StaffEditRequest.class);
         Staff staff = mock(Staff.class);
 
-        when(staffRepository.findOne(eq(id))).thenReturn(staff);
+        when(staffRepository.findOne(eq(uuid))).thenReturn(staff);
         when(editRequest.getUsername()).thenReturn("admin");
         when(editRequest.getPassword()).thenReturn("secret");
         when(editRequest.getPermissions()).thenReturn(Arrays.asList(
@@ -291,7 +291,7 @@ public class StaffResourceTest {
         ));
 
         staffResource.updateStaff(
-                id,
+                uuid.toString(),
                 editRequest,
                 bindingResult,
                 principal,
@@ -300,8 +300,8 @@ public class StaffResourceTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void testUpdateStaffNotFound() throws Exception {
-        String id = "1";
+    public void testUpdateStaffNotFound() {
+        UUID uuid = UUID.randomUUID();
         StaffEditRequest editRequest = mock(StaffEditRequest.class);
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.EDIT_STAFF.name())));
@@ -313,7 +313,7 @@ public class StaffResourceTest {
         ));
 
         staffResource.updateStaff(
-                id,
+                uuid.toString(),
                 editRequest,
                 bindingResult,
                 principal,
@@ -322,8 +322,8 @@ public class StaffResourceTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testUpdateStaffBadUsername() throws Exception {
-        String id = "1";
+    public void testUpdateStaffBadUsername() {
+        UUID uuid = UUID.randomUUID();
         StaffEditRequest editRequest = mock(StaffEditRequest.class);
         Staff staff = mock(Staff.class);
         ObjectError objectError = mock(ObjectError.class);
@@ -332,7 +332,7 @@ public class StaffResourceTest {
         when(objectError.getDefaultMessage()).thenReturn("Invalid username.");
         when(bindingResult.hasErrors()).thenReturn(true);
         when(bindingResult.getAllErrors()).thenReturn(Collections.singletonList(objectError));
-        when(staffRepository.findOne(eq(id))).thenReturn(staff);
+        when(staffRepository.findOne(eq(uuid))).thenReturn(staff);
         when(editRequest.getUsername()).thenReturn("");
         when(editRequest.getPassword()).thenReturn("secret");
         when(editRequest.getPermissions()).thenReturn(Arrays.asList(
@@ -341,7 +341,7 @@ public class StaffResourceTest {
         ));
 
         staffResource.updateStaff(
-                id,
+                uuid.toString(),
                 editRequest,
                 bindingResult,
                 principal,
@@ -350,8 +350,8 @@ public class StaffResourceTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testUpdateStaffBadPassword() throws Exception {
-        String id = "1";
+    public void testUpdateStaffBadPassword() {
+        UUID uuid = UUID.randomUUID();
         StaffEditRequest editRequest = mock(StaffEditRequest.class);
         Staff staff = mock(Staff.class);
         ObjectError objectError = mock(ObjectError.class);
@@ -360,7 +360,7 @@ public class StaffResourceTest {
         when(objectError.getDefaultMessage()).thenReturn("Invalid password.");
         when(bindingResult.hasErrors()).thenReturn(true);
         when(bindingResult.getAllErrors()).thenReturn(Collections.singletonList(objectError));
-        when(staffRepository.findOne(eq(id))).thenReturn(staff);
+        when(staffRepository.findOne(eq(uuid))).thenReturn(staff);
         when(editRequest.getUsername()).thenReturn("admin");
         when(editRequest.getPassword()).thenReturn("");
         when(editRequest.getPermissions()).thenReturn(Arrays.asList(
@@ -369,7 +369,7 @@ public class StaffResourceTest {
         ));
 
         staffResource.updateStaff(
-                id,
+                uuid.toString(),
                 editRequest,
                 bindingResult,
                 principal,
@@ -378,21 +378,21 @@ public class StaffResourceTest {
     }
 
     @Test
-    public void testDeleteStaff() throws Exception {
-        String id = "id";
+    public void testDeleteStaff() {
+        UUID uuid = UUID.randomUUID();
         Staff staff = mock(Staff.class);
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.DELETE_STAFF.name())));
-        when(staffRepository.findOne(eq(id))).thenReturn(staff);
+        when(staffRepository.findOne(eq(uuid))).thenReturn(staff);
 
         Staff result = staffResource.deleteStaff(
-                id,
+                uuid.toString(),
                 principal,
                 request
         );
 
         assertEquals(staff, result);
-        verify(staffRepository).findOne(eq(id));
+        verify(staffRepository).findOne(eq(uuid));
         verify(staffRepository).delete(eq(staff));
         verify(staffLoader).evaluateSecurity();
         verify(auditLogService).extractRemoteIp(eq(request));
@@ -400,7 +400,7 @@ public class StaffResourceTest {
     }
 
     @Test(expected = InsufficientPermissionException.class)
-    public void testDeleteStaffNoPermission() throws Exception {
+    public void testDeleteStaffNoPermission() {
         String id = "id";
 
         staffResource.deleteStaff(
@@ -411,7 +411,7 @@ public class StaffResourceTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void testDeleteStaffNotFound() throws Exception {
+    public void testDeleteStaffNotFound() {
         String id = "id";
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.DELETE_STAFF.name())));

@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Controller
@@ -108,7 +109,8 @@ public class StaffResource {
             throw new InsufficientPermissionException("Not allowed to edit staff accounts.");
         }
 
-        Staff staff = staffRepository.findOne(id);
+        UUID uuid = UUID.fromString(id);
+        Staff staff = staffRepository.findOne(uuid);
 
         if (staff == null) {
             throw new NullPointerException("No such staff account found.");
@@ -152,7 +154,8 @@ public class StaffResource {
             throw new InsufficientPermissionException("Not allowed to delete staff accounts.");
         }
 
-        Staff staff = staffRepository.findOne(id);
+        UUID uuid = UUID.fromString(id);
+        Staff staff = staffRepository.findOne(uuid);
 
         if (staff == null) {
             throw new NullPointerException("No such staff account found.");

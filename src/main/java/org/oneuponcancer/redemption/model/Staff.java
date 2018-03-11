@@ -1,21 +1,26 @@
 package org.oneuponcancer.redemption.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
+import org.hibernate.annotations.Type;
 
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import java.util.HashSet;
 import java.util.Set;
 
-@Document
+@Entity
 public class Staff {
     @Id
+    @GeneratedValue
+    @Type(type = "pg-uuid")
     private String id;
 
-    @Indexed(unique = true)
     private String username;
-
     private String password;
+
+    @ManyToMany(fetch = FetchType.EAGER)
     private Set<Permission> permissions = new HashSet<>();
 
     public String getId() {

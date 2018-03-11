@@ -26,6 +26,7 @@ import javax.validation.ValidationException;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Controller
@@ -90,7 +91,8 @@ public class AssetResource {
             throw new InsufficientPermissionException("Not allowed to edit assets.");
         }
 
-        Asset asset = assetRepository.findOne(id);
+        UUID uuid = UUID.fromString(id);
+        Asset asset = assetRepository.findOne(uuid);
 
         if (asset == null) {
             throw new NullPointerException("No such asset found.");
@@ -127,7 +129,8 @@ public class AssetResource {
             throw new InsufficientPermissionException("Not allowed to delete assets.");
         }
 
-        Asset asset = assetRepository.findOne(id);
+        UUID uuid = UUID.fromString(id);
+        Asset asset = assetRepository.findOne(uuid);
 
         if (asset == null) {
             throw new NullPointerException("No such asset found.");
