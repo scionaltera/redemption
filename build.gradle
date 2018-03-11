@@ -68,6 +68,7 @@ task buildDocker(type: Docker, dependsOn: build) {
     applicationName = jar.getBaseName()
     dockerfile = file('src/main/docker/local/Dockerfile')
     tagVersion = "latest"
+    tag = "scionaltera/${applicationName}"
 
     doFirst {
         copy {
