@@ -28,6 +28,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 @Controller
 public class IndexResource {
@@ -125,7 +126,8 @@ public class IndexResource {
             throw new InsufficientPermissionException("Not allowed to edit staff accounts.");
         }
 
-        Staff staff = staffRepository.findOne(id);
+        UUID uuid = UUID.fromString(id);
+        Staff staff = staffRepository.findOne(uuid);
 
         if (staff == null) {
             throw new IllegalArgumentException("No staff member with provided ID");
@@ -156,7 +158,8 @@ public class IndexResource {
             throw new InsufficientPermissionException("Not allowed to list assets.");
         }
 
-        Asset asset = assetRepository.findOne(id);
+        UUID uuid = UUID.fromString(id);
+        Asset asset = assetRepository.findOne(uuid);
 
         if (asset == null) {
             throw new IllegalArgumentException("No asset with provided ID");
@@ -187,7 +190,8 @@ public class IndexResource {
             throw new InsufficientPermissionException("Not allowed to list participants.");
         }
 
-        Participant participant = participantRepository.findOne(id);
+        UUID uuid = UUID.fromString(id);
+        Participant participant = participantRepository.findOne(uuid);
 
         if (participant == null) {
             throw new IllegalArgumentException("No participant with provided ID");

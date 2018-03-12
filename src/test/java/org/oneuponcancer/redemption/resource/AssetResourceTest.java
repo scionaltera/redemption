@@ -54,7 +54,7 @@ public class AssetResourceTest {
     private AssetResource assetResource;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
 
         for (int i = 0; i < 3; i++) {
@@ -65,7 +65,7 @@ public class AssetResourceTest {
         when(assetRepository.save(any(Asset.class))).thenAnswer(i -> {
             Asset asset = i.getArgumentAt(0, Asset.class);
 
-            asset.setId(UUID.randomUUID().toString());
+            asset.setId(UUID.randomUUID());
 
             return asset;
         });
@@ -76,7 +76,7 @@ public class AssetResourceTest {
     }
 
     @Test
-    public void testFetchAsset() throws Exception {
+    public void testFetchAsset() {
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.LIST_ASSET.name())));
 
         List<Asset> result = assetResource.fetchAsset(principal);
@@ -85,12 +85,12 @@ public class AssetResourceTest {
     }
 
     @Test(expected = InsufficientPermissionException.class)
-    public void testFetchAssetNoPermission() throws Exception {
+    public void testFetchAssetNoPermission() {
         assetResource.fetchAsset(principal);
     }
 
     @Test
-    public void testCreateAsset() throws Exception {
+    public void testCreateAsset() {
         AssetCreateRequest createRequest = mock(AssetCreateRequest.class);
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.CREATE_ASSET.name())));
@@ -117,7 +117,7 @@ public class AssetResourceTest {
     }
 
     @Test(expected = InsufficientPermissionException.class)
-    public void testCreateAssetNoPermission() throws Exception {
+    public void testCreateAssetNoPermission() {
         AssetCreateRequest createRequest = mock(AssetCreateRequest.class);
 
         when(createRequest.getName()).thenReturn("Foop");
@@ -132,7 +132,7 @@ public class AssetResourceTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testCreateAssetInvalidName() throws Exception {
+    public void testCreateAssetInvalidName() {
         AssetCreateRequest createRequest = mock(AssetCreateRequest.class);
         ObjectError objectError = mock(ObjectError.class);
 
@@ -152,7 +152,7 @@ public class AssetResourceTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testCreateAssetInvalidDescription() throws Exception {
+    public void testCreateAssetInvalidDescription() {
         AssetCreateRequest createRequest = mock(AssetCreateRequest.class);
         ObjectError objectError = mock(ObjectError.class);
 
@@ -172,18 +172,18 @@ public class AssetResourceTest {
     }
 
     @Test
-    public void testUpdateAsset() throws Exception {
-        String id = "1";
+    public void testUpdateAsset() {
+        UUID uuid = UUID.randomUUID();
         AssetEditRequest editRequest = mock(AssetEditRequest.class);
         Asset asset = mock(Asset.class);
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.EDIT_ASSET.name())));
-        when(assetRepository.findOne(eq(id))).thenReturn(asset);
+        when(assetRepository.findOne(eq(uuid))).thenReturn(asset);
         when(editRequest.getName()).thenReturn("Foop");
         when(editRequest.getDescription()).thenReturn("A big bag of foop.");
 
         Asset response = assetResource.updateAsset(
-                id,
+                uuid.toString(),
                 editRequest,
                 bindingResult,
                 principal,
@@ -199,17 +199,17 @@ public class AssetResourceTest {
     }
 
     @Test(expected = InsufficientPermissionException.class)
-    public void testUpdateAssetNoPermission() throws Exception {
-        String id = "1";
+    public void testUpdateAssetNoPermission() {
+        UUID uuid = UUID.randomUUID();
         AssetEditRequest editRequest = mock(AssetEditRequest.class);
         Asset asset = mock(Asset.class);
 
-        when(assetRepository.findOne(eq(id))).thenReturn(asset);
+        when(assetRepository.findOne(eq(uuid))).thenReturn(asset);
         when(editRequest.getName()).thenReturn("Carp");
         when(editRequest.getDescription()).thenReturn("A bucket of carp.");
 
         assetResource.updateAsset(
-                id,
+                uuid.toString(),
                 editRequest,
                 bindingResult,
                 principal,
@@ -218,8 +218,8 @@ public class AssetResourceTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void testUpdateAssetNotFound() throws Exception {
-        String id = "1";
+    public void testUpdateAssetNotFound() {
+        UUID uuid = UUID.randomUUID();
         AssetEditRequest editRequest = mock(AssetEditRequest.class);
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.EDIT_ASSET.name())));
@@ -227,7 +227,7 @@ public class AssetResourceTest {
         when(editRequest.getDescription()).thenReturn("A bucket of carp.");
 
         assetResource.updateAsset(
-                id,
+                uuid.toString(),
                 editRequest,
                 bindingResult,
                 principal,
@@ -236,8 +236,8 @@ public class AssetResourceTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testUpdateAssetBadName() throws Exception {
-        String id = "1";
+    public void testUpdateAssetBadName() {
+        UUID uuid = UUID.randomUUID();
         AssetEditRequest editRequest = mock(AssetEditRequest.class);
         Asset asset = mock(Asset.class);
         ObjectError objectError = mock(ObjectError.class);
@@ -246,12 +246,12 @@ public class AssetResourceTest {
         when(objectError.getDefaultMessage()).thenReturn("Invalid name.");
         when(bindingResult.hasErrors()).thenReturn(true);
         when(bindingResult.getAllErrors()).thenReturn(Collections.singletonList(objectError));
-        when(assetRepository.findOne(eq(id))).thenReturn(asset);
+        when(assetRepository.findOne(eq(uuid))).thenReturn(asset);
         when(editRequest.getName()).thenReturn("");
         when(editRequest.getDescription()).thenReturn("A bucket of carp.");
 
         assetResource.updateAsset(
-                id,
+                uuid.toString(),
                 editRequest,
                 bindingResult,
                 principal,
@@ -260,8 +260,8 @@ public class AssetResourceTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testUpdateAssetBadDescription() throws Exception {
-        String id = "1";
+    public void testUpdateAssetBadDescription() {
+        UUID uuid = UUID.randomUUID();
         AssetEditRequest editRequest = mock(AssetEditRequest.class);
         Asset asset = mock(Asset.class);
         ObjectError objectError = mock(ObjectError.class);
@@ -270,12 +270,12 @@ public class AssetResourceTest {
         when(objectError.getDefaultMessage()).thenReturn("Invalid description.");
         when(bindingResult.hasErrors()).thenReturn(true);
         when(bindingResult.getAllErrors()).thenReturn(Collections.singletonList(objectError));
-        when(assetRepository.findOne(eq(id))).thenReturn(asset);
+        when(assetRepository.findOne(eq(uuid))).thenReturn(asset);
         when(editRequest.getName()).thenReturn("Carp");
         when(editRequest.getDescription()).thenReturn("");
 
         assetResource.updateAsset(
-                id,
+                uuid.toString(),
                 editRequest,
                 bindingResult,
                 principal,
@@ -284,45 +284,45 @@ public class AssetResourceTest {
     }
 
     @Test
-    public void testDeleteAsset() throws Exception {
-        String id = "id";
+    public void testDeleteAsset() {
+        UUID uuid = UUID.randomUUID();
         Asset asset = mock(Asset.class);
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.DELETE_ASSET.name())));
-        when(assetRepository.findOne(eq(id))).thenReturn(asset);
+        when(assetRepository.findOne(eq(uuid))).thenReturn(asset);
 
         Asset result = assetResource.deleteAsset(
-                id,
+                uuid.toString(),
                 principal,
                 request
         );
 
         assertEquals(asset, result);
-        verify(assetRepository).findOne(eq(id));
+        verify(assetRepository).findOne(eq(uuid));
         verify(assetRepository).delete(eq(asset));
         verify(auditLogService).extractRemoteIp(eq(request));
         verify(auditLogService).log(anyString(), anyString(), anyString());
     }
 
     @Test(expected = InsufficientPermissionException.class)
-    public void testDeleteAssetNoPermission() throws Exception {
-        String id = "id";
+    public void testDeleteAssetNoPermission() {
+        UUID uuid = UUID.randomUUID();
 
         assetResource.deleteAsset(
-                id,
+                uuid.toString(),
                 principal,
                 request
         );
     }
 
     @Test(expected = NullPointerException.class)
-    public void testDeleteAssetNotFound() throws Exception {
-        String id = "id";
+    public void testDeleteAssetNotFound() {
+        UUID uuid = UUID.randomUUID();
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.DELETE_ASSET.name())));
 
         assetResource.deleteAsset(
-                id,
+                uuid.toString(),
                 principal,
                 request
         );

@@ -26,6 +26,7 @@ import javax.validation.ValidationException;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Controller
@@ -92,7 +93,8 @@ public class ParticipantResource {
             throw new InsufficientPermissionException("Not allowed to edit participants.");
         }
 
-        Participant participant = participantRepository.findOne(id);
+        UUID uuid = UUID.fromString(id);
+        Participant participant = participantRepository.findOne(uuid);
 
         if (participant == null) {
             throw new NullPointerException("No such participant found.");
@@ -131,7 +133,8 @@ public class ParticipantResource {
             throw new InsufficientPermissionException("Not allowed to delete participants.");
         }
 
-        Participant participant = participantRepository.findOne(id);
+        UUID uuid = UUID.fromString(id);
+        Participant participant = participantRepository.findOne(uuid);
 
         if (participant == null) {
             throw new NullPointerException("No such participant found.");

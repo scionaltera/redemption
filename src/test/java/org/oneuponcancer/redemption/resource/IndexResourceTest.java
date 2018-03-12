@@ -19,6 +19,7 @@ import org.springframework.ui.Model;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.UUID;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -56,7 +57,7 @@ public class IndexResourceTest {
     private IndexResource indexResource;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
 
         indexResource = new IndexResource(
@@ -68,7 +69,7 @@ public class IndexResourceTest {
     }
 
     @Test
-    public void testIndexNullPrincipal() throws Exception {
+    public void testIndexNullPrincipal() {
         String result = indexResource.index(null, model);
 
         verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
@@ -77,14 +78,14 @@ public class IndexResourceTest {
     }
 
     @Test
-    public void testIndexPrincipal() throws Exception {
+    public void testIndexPrincipal() {
         String result = indexResource.index(principal, model);
 
         assertEquals("redirect:/dashboard", result);
     }
 
     @Test
-    public void testLoginNullParams() throws Exception {
+    public void testLoginNullParams() {
         String result = indexResource.login(null, null, model);
 
         verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
@@ -94,7 +95,7 @@ public class IndexResourceTest {
     }
 
     @Test
-    public void testLoginLogout() throws Exception {
+    public void testLoginLogout() {
         String result = indexResource.login("logged out", null, model);
 
         verify(model).addAttribute(eq("message"), contains("logged out"));
@@ -105,7 +106,7 @@ public class IndexResourceTest {
     }
 
     @Test
-    public void testLoginError() throws Exception {
+    public void testLoginError() {
         String result = indexResource.login(null, "credentials", model);
 
         verify(model).addAttribute(eq("message"), contains("credentials"));
@@ -116,7 +117,7 @@ public class IndexResourceTest {
     }
 
     @Test
-    public void testDashboard() throws Exception {
+    public void testDashboard() {
         when(principal.getName()).thenReturn("admin");
         when(principal.getAuthorities()).thenReturn(Arrays.asList(
                 new SimpleGrantedAuthority(Permission.LIST_STAFF.name()),
@@ -142,7 +143,7 @@ public class IndexResourceTest {
     }
 
     @Test
-    public void testDashboardNoListStaffPermission() throws Exception {
+    public void testDashboardNoListStaffPermission() {
         when(principal.getName()).thenReturn("admin");
         when(principal.getAuthorities()).thenReturn(Arrays.asList(
                 new SimpleGrantedAuthority(Permission.EDIT_STAFF.name()),
@@ -167,7 +168,7 @@ public class IndexResourceTest {
     }
 
     @Test
-    public void testDashboardNoCreateStaffPermission() throws Exception {
+    public void testDashboardNoCreateStaffPermission() {
         when(principal.getName()).thenReturn("admin");
         when(principal.getAuthorities()).thenReturn(Arrays.asList(
                 new SimpleGrantedAuthority(Permission.LIST_STAFF.name()),
@@ -192,7 +193,7 @@ public class IndexResourceTest {
     }
 
     @Test
-    public void testDashboardNoEditStaffPermission() throws Exception {
+    public void testDashboardNoEditStaffPermission() {
         when(principal.getName()).thenReturn("admin");
         when(principal.getAuthorities()).thenReturn(Arrays.asList(
                 new SimpleGrantedAuthority(Permission.LIST_STAFF.name()),
@@ -217,7 +218,7 @@ public class IndexResourceTest {
     }
 
     @Test
-    public void testDashboardNoDeleteStaffPermission() throws Exception {
+    public void testDashboardNoDeleteStaffPermission() {
         when(principal.getName()).thenReturn("admin");
         when(principal.getAuthorities()).thenReturn(Arrays.asList(
                 new SimpleGrantedAuthority(Permission.LIST_STAFF.name()),
@@ -242,7 +243,7 @@ public class IndexResourceTest {
     }
 
     @Test
-    public void testDashboardNoReadLogPermission() throws Exception {
+    public void testDashboardNoReadLogPermission() {
         when(principal.getName()).thenReturn("admin");
         when(principal.getAuthorities()).thenReturn(Arrays.asList(
                 new SimpleGrantedAuthority(Permission.LIST_STAFF.name()),
@@ -267,7 +268,7 @@ public class IndexResourceTest {
     }
 
     @Test
-    public void testCreateStaff() throws Exception {
+    public void testCreateStaff() {
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(
                 new SimpleGrantedAuthority(Permission.CREATE_STAFF.name())
         ));
@@ -281,20 +282,20 @@ public class IndexResourceTest {
     }
 
     @Test(expected = InsufficientPermissionException.class)
-    public void testCreateStaffNoPermission() throws Exception {
+    public void testCreateStaffNoPermission() {
         indexResource.createStaff(principal, model);
     }
 
     @Test
-    public void testEditStaff() throws Exception {
-        String id = "staff_id";
+    public void testEditStaff() {
+        UUID uuid = UUID.randomUUID();
 
-        when(staffRepository.findOne(eq(id))).thenReturn(staff);
+        when(staffRepository.findOne(eq(uuid))).thenReturn(staff);
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(
                 new SimpleGrantedAuthority(Permission.EDIT_STAFF.name())
         ));
 
-        String result = indexResource.editStaff(principal, model, id);
+        String result = indexResource.editStaff(principal, model, uuid.toString());
 
         assertEquals("staffedit", result);
 
@@ -304,12 +305,12 @@ public class IndexResourceTest {
     }
 
     @Test(expected = InsufficientPermissionException.class)
-    public void testEditStaffNoPermission() throws Exception {
+    public void testEditStaffNoPermission() {
         indexResource.editStaff(principal, model, "staff_id");
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testEditStaffNoSuchId() throws Exception {
+    public void testEditStaffNoSuchId() {
         String id = "bogus_staff_id";
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(
@@ -320,7 +321,7 @@ public class IndexResourceTest {
     }
 
     @Test
-    public void testCreateAsset() throws Exception {
+    public void testCreateAsset() {
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(
                 new SimpleGrantedAuthority(Permission.CREATE_ASSET.name())
         ));
@@ -334,20 +335,20 @@ public class IndexResourceTest {
     }
 
     @Test(expected = InsufficientPermissionException.class)
-    public void testCreateAssetNoPermission() throws Exception {
+    public void testCreateAssetNoPermission() {
         indexResource.createAsset(principal, model);
     }
 
     @Test
-    public void testEditAsset() throws Exception {
-        String id = "asset_id";
+    public void testEditAsset() {
+        UUID uuid = UUID.randomUUID();
 
-        when(assetRepository.findOne(eq(id))).thenReturn(asset);
+        when(assetRepository.findOne(eq(uuid))).thenReturn(asset);
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(
                 new SimpleGrantedAuthority(Permission.EDIT_ASSET.name())
         ));
 
-        String result = indexResource.editAsset(principal, model, id);
+        String result = indexResource.editAsset(principal, model, uuid.toString());
 
         assertEquals("assetedit", result);
 
@@ -357,12 +358,12 @@ public class IndexResourceTest {
     }
 
     @Test(expected = InsufficientPermissionException.class)
-    public void testEditAssetNoPermission() throws Exception {
+    public void testEditAssetNoPermission() {
         indexResource.editAsset(principal, model, "asset_id");
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testEditAssetNoSuchId() throws Exception {
+    public void testEditAssetNoSuchId() {
         String id = "bogus_asset_id";
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(
@@ -373,7 +374,7 @@ public class IndexResourceTest {
     }
 
     @Test
-    public void testCreateParticipant() throws Exception {
+    public void testCreateParticipant() {
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(
                 new SimpleGrantedAuthority(Permission.CREATE_PARTICIPANT.name())
         ));
@@ -387,20 +388,20 @@ public class IndexResourceTest {
     }
 
     @Test(expected = InsufficientPermissionException.class)
-    public void testCreateParticipantNoPermission() throws Exception {
+    public void testCreateParticipantNoPermission() {
         indexResource.createParticipant(principal, model);
     }
 
     @Test
-    public void testEditParticipant() throws Exception {
-        String id = "participant_id";
+    public void testEditParticipant() {
+        UUID uuid = UUID.randomUUID();
 
-        when(participantRepository.findOne(eq(id))).thenReturn(participant);
+        when(participantRepository.findOne(eq(uuid))).thenReturn(participant);
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(
                 new SimpleGrantedAuthority(Permission.EDIT_PARTICIPANT.name())
         ));
 
-        String result = indexResource.editParticipant(principal, model, id);
+        String result = indexResource.editParticipant(principal, model, uuid.toString());
 
         assertEquals("participantedit", result);
 
@@ -410,12 +411,12 @@ public class IndexResourceTest {
     }
 
     @Test(expected = InsufficientPermissionException.class)
-    public void testEditParticipantNoPermission() throws Exception {
+    public void testEditParticipantNoPermission() {
         indexResource.editParticipant(principal, model, "participant_id");
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testEditParticipantNoSuchId() throws Exception {
+    public void testEditParticipantNoSuchId() {
         String id = "bogus_participant_id";
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(

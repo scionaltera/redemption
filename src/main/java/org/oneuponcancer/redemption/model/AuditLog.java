@@ -1,22 +1,28 @@
 package org.oneuponcancer.redemption.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import org.hibernate.annotations.Type;
 
-@Document
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import java.util.UUID;
+
+@Entity
 public class AuditLog {
     @Id
-    private String id;
+    @GeneratedValue
+    @Type(type = "pg-uuid")
+    private UUID id;
     private Long timestamp;
     private String username;
     private String remoteAddress;
     private String message;
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 

@@ -9,15 +9,19 @@
 
 version: "2"
 services:
-  mongo:
-    image: mongo
+  postgres:
+    image: postgres:9.6
     ports:
-     - "27017"
+     - "5432:5432"
+    environment:
+      POSTGRES_USER: redemption
+      POSTGRES_PASSWORD: redemption
+      POSTGRES_DB: redemption
   redemption:
     image: scionaltera/redemption:latest
     ports:
      - "8080:8080"
      - "5005:5005"
     links:
-     - mongo
+     - postgres
     env_file: secrets.env
