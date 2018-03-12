@@ -76,7 +76,7 @@ public class StaffResourceTest {
         when(staffRepository.save(any(Staff.class))).thenAnswer(i -> {
             Staff staff = i.getArgumentAt(0, Staff.class);
 
-            staff.setId(UUID.randomUUID().toString());
+            staff.setId(UUID.randomUUID());
 
             return staff;
         });
@@ -401,10 +401,10 @@ public class StaffResourceTest {
 
     @Test(expected = InsufficientPermissionException.class)
     public void testDeleteStaffNoPermission() {
-        String id = "id";
+        UUID uuid = UUID.randomUUID();
 
         staffResource.deleteStaff(
-                id,
+                uuid.toString(),
                 principal,
                 request
         );
@@ -412,12 +412,12 @@ public class StaffResourceTest {
 
     @Test(expected = NullPointerException.class)
     public void testDeleteStaffNotFound() {
-        String id = "id";
+        UUID uuid = UUID.randomUUID();
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.DELETE_STAFF.name())));
 
         staffResource.deleteStaff(
-                id,
+                uuid.toString(),
                 principal,
                 request
         );

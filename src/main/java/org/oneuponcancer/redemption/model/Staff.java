@@ -2,32 +2,36 @@ package org.oneuponcancer.redemption.model;
 
 import org.hibernate.annotations.Type;
 
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 public class Staff {
     @Id
     @GeneratedValue
     @Type(type = "pg-uuid")
-    private String id;
+    private UUID id;
 
     private String username;
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ElementCollection(targetClass = Permission.class, fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
     private Set<Permission> permissions = new HashSet<>();
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 

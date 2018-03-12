@@ -65,7 +65,7 @@ public class ParticipantResourceTest {
         when(participantRepository.save(any(Participant.class))).thenAnswer(i -> {
             Participant participant = i.getArgumentAt(0, Participant.class);
 
-            participant.setId(UUID.randomUUID().toString());
+            participant.setId(UUID.randomUUID());
 
             return participant;
         });
@@ -227,7 +227,7 @@ public class ParticipantResourceTest {
 
     @Test(expected = NullPointerException.class)
     public void testUpdateParticipantNotFound() {
-        String id = "1";
+        UUID uuid = UUID.randomUUID();
         ParticipantEditRequest editRequest = mock(ParticipantEditRequest.class);
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.EDIT_PARTICIPANT.name())));
@@ -236,7 +236,7 @@ public class ParticipantResourceTest {
         when(editRequest.getEmail()).thenReturn("first@lasterson.com");
 
         participantResource.updateParticipant(
-                id,
+                uuid.toString(),
                 editRequest,
                 bindingResult,
                 principal,
@@ -317,10 +317,10 @@ public class ParticipantResourceTest {
 
     @Test(expected = InsufficientPermissionException.class)
     public void testDeleteParticipantNoPermission() {
-        String id = "id";
+        UUID uuid = UUID.randomUUID();
 
         participantResource.deleteParticipant(
-                id,
+                uuid.toString(),
                 principal,
                 request
         );
@@ -328,12 +328,12 @@ public class ParticipantResourceTest {
 
     @Test(expected = NullPointerException.class)
     public void testDeleteParticipantNotFound() {
-        String id = "id";
+        UUID uuid = UUID.randomUUID();
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.DELETE_PARTICIPANT.name())));
 
         participantResource.deleteParticipant(
-                id,
+                uuid.toString(),
                 principal,
                 request
         );

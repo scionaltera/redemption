@@ -5,23 +5,24 @@ import org.hibernate.annotations.Type;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.util.UUID;
 
 @Entity
 public class Participant {
     @Id
     @GeneratedValue
     @Type(type = "pg-uuid")
-    private String id;
+    private UUID id;
 
     private String firstName;
     private String lastName;
     private String email;
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
