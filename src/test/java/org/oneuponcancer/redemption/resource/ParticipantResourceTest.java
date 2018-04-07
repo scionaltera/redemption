@@ -23,6 +23,7 @@ import javax.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
@@ -183,7 +184,7 @@ public class ParticipantResourceTest {
         Participant participant = mock(Participant.class);
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.EDIT_PARTICIPANT.name())));
-        when(participantRepository.findOne(eq(uuid))).thenReturn(participant);
+        when(participantRepository.findById(eq(uuid))).thenReturn(Optional.of(participant));
         when(editRequest.getFirstName()).thenReturn("First");
         when(editRequest.getLastName()).thenReturn("Lasterson");
         when(editRequest.getEmail()).thenReturn("first@lasterson.com");
@@ -211,7 +212,7 @@ public class ParticipantResourceTest {
         ParticipantEditRequest editRequest = mock(ParticipantEditRequest.class);
         Participant participant = mock(Participant.class);
 
-        when(participantRepository.findOne(eq(uuid))).thenReturn(participant);
+        when(participantRepository.findById(eq(uuid))).thenReturn(Optional.of(participant));
         when(editRequest.getFirstName()).thenReturn("First");
         when(editRequest.getLastName()).thenReturn("Lasterson");
         when(editRequest.getEmail()).thenReturn("first@lasterson.com");
@@ -255,7 +256,7 @@ public class ParticipantResourceTest {
         when(objectError.getDefaultMessage()).thenReturn("Invalid name.");
         when(bindingResult.hasErrors()).thenReturn(true);
         when(bindingResult.getAllErrors()).thenReturn(Collections.singletonList(objectError));
-        when(participantRepository.findOne(eq(uuid))).thenReturn(participant);
+        when(participantRepository.findById(eq(uuid))).thenReturn(Optional.of(participant));
         when(editRequest.getFirstName()).thenReturn("First");
         when(editRequest.getLastName()).thenReturn("Lasterson");
         when(editRequest.getEmail()).thenReturn("first@lasterson.com");
@@ -280,7 +281,7 @@ public class ParticipantResourceTest {
         when(objectError.getDefaultMessage()).thenReturn("Invalid description.");
         when(bindingResult.hasErrors()).thenReturn(true);
         when(bindingResult.getAllErrors()).thenReturn(Collections.singletonList(objectError));
-        when(participantRepository.findOne(eq(uuid))).thenReturn(participant);
+        when(participantRepository.findById(eq(uuid))).thenReturn(Optional.of(participant));
         when(editRequest.getFirstName()).thenReturn("First");
         when(editRequest.getLastName()).thenReturn("Lasterson");
         when(editRequest.getEmail()).thenReturn("first@lasterson.com");
@@ -300,7 +301,7 @@ public class ParticipantResourceTest {
         Participant participant = mock(Participant.class);
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.DELETE_PARTICIPANT.name())));
-        when(participantRepository.findOne(eq(uuid))).thenReturn(participant);
+        when(participantRepository.findById(eq(uuid))).thenReturn(Optional.of(participant));
 
         Participant result = participantResource.deleteParticipant(
                 uuid.toString(),
@@ -309,7 +310,7 @@ public class ParticipantResourceTest {
         );
 
         assertEquals(participant, result);
-        verify(participantRepository).findOne(eq(uuid));
+        verify(participantRepository).findById(eq(uuid));
         verify(participantRepository).delete(eq(participant));
         verify(auditLogService).extractRemoteIp(eq(request));
         verify(auditLogService).log(anyString(), anyString(), anyString());

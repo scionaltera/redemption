@@ -26,11 +26,9 @@ public class StaffDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Staff staff = staffRepository.findByUsername(username);
-
-        if (staff == null) {
-            throw new UsernameNotFoundException("Username not found.");
-        }
+        Staff staff = staffRepository
+                .findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Username not found."));
 
         if (!staff.hasPermission(Permission.LOGIN)) {
             throw new UsernameNotFoundException("User is not allowed to log in.");

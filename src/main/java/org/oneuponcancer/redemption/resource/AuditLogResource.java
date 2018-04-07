@@ -50,7 +50,7 @@ public class AuditLogResource {
             throw new IllegalArgumentException("The number of returned results must be at least one.");
         }
 
-        PageRequest request = new PageRequest(0, count, SORT_DESC);
+        PageRequest request = PageRequest.of(0, count, SORT_DESC);
         Page<AuditLog> results = auditLogRepository.findAll(request);
 
         return results.getContent();

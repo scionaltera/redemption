@@ -94,11 +94,9 @@ public class ParticipantResource {
         }
 
         UUID uuid = UUID.fromString(id);
-        Participant participant = participantRepository.findOne(uuid);
-
-        if (participant == null) {
-            throw new NullPointerException("No such participant found.");
-        }
+        Participant participant = participantRepository
+                .findById(uuid)
+                .orElseThrow(() -> new NullPointerException("No such participant found."));
 
         if (bindingResult.hasErrors()) {
             String errorMessages = bindingResult.getAllErrors()
@@ -134,11 +132,9 @@ public class ParticipantResource {
         }
 
         UUID uuid = UUID.fromString(id);
-        Participant participant = participantRepository.findOne(uuid);
-
-        if (participant == null) {
-            throw new NullPointerException("No such participant found.");
-        }
+        Participant participant = participantRepository
+                .findById(uuid)
+                .orElseThrow(() -> new NullPointerException("No such participant found."));
 
         participantRepository.delete(participant);
 

@@ -46,7 +46,9 @@ public class StaffLoader {
             LOGGER.warn("No staff accounts found in database. Populated the default account.");
             LOGGER.warn("Please be sure to create new accounts before using Redemption in a production setting!");
         } else {
-            Staff admin = staffRepository.findByUsername(DEFAULT_USER);
+            Staff admin = staffRepository
+                    .findByUsername(DEFAULT_USER)
+                    .orElse(null);
 
             if (admin != null && bCryptPasswordEncoder.matches(DEFAULT_PASS, admin.getPassword())) {
                 LOGGER.warn("The default staff account exists in the database!");

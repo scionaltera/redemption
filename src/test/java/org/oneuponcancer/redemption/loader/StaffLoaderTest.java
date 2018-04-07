@@ -12,6 +12,7 @@ import org.oneuponcancer.redemption.repository.StaffRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -29,7 +30,7 @@ public class StaffLoaderTest {
     private StaffLoader staffLoader;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
 
         when(bCryptPasswordEncoder.encode(anyString())).thenAnswer(invocation -> invocation.getArgumentAt(0, String.class));
@@ -40,7 +41,7 @@ public class StaffLoaderTest {
     }
 
     @Test
-    public void testLoadEmptyDatabase() throws Exception {
+    public void testLoadEmptyDatabase() {
         when(staffRepository.count()).thenReturn(0L);
 
         staffLoader.evaluateSecurity();
@@ -59,14 +60,14 @@ public class StaffLoaderTest {
     }
 
     @Test
-    public void testLoadDatabaseWithDefaultUser() throws Exception {
+    public void testLoadDatabaseWithDefaultUser() {
         Staff user = new Staff();
 
         user.setUsername(StaffLoader.DEFAULT_USER);
         user.setPassword(StaffLoader.DEFAULT_PASS);
 
         when(staffRepository.count()).thenReturn(1L);
-        when(staffRepository.findByUsername(eq(StaffLoader.DEFAULT_USER))).thenReturn(user);
+        when(staffRepository.findByUsername(eq(StaffLoader.DEFAULT_USER))).thenReturn(Optional.of(user));
 
         staffLoader.evaluateSecurity();
 
@@ -76,14 +77,14 @@ public class StaffLoaderTest {
     }
 
     @Test
-    public void testLoadDatabaseNoDefaultUser() throws Exception {
+    public void testLoadDatabaseNoDefaultUser() {
         Staff user = new Staff();
 
         user.setUsername(StaffLoader.DEFAULT_USER);
         user.setPassword("secure");
 
         when(staffRepository.count()).thenReturn(1L);
-        when(staffRepository.findByUsername(eq(StaffLoader.DEFAULT_USER))).thenReturn(user);
+        when(staffRepository.findByUsername(eq(StaffLoader.DEFAULT_USER))).thenReturn(Optional.of(user));
 
         staffLoader.evaluateSecurity();
 

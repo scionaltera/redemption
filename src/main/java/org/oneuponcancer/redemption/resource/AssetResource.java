@@ -92,11 +92,9 @@ public class AssetResource {
         }
 
         UUID uuid = UUID.fromString(id);
-        Asset asset = assetRepository.findOne(uuid);
-
-        if (asset == null) {
-            throw new NullPointerException("No such asset found.");
-        }
+        Asset asset = assetRepository
+                .findById(uuid)
+                .orElseThrow(() -> new NullPointerException("No such asset found."));
 
         if (bindingResult.hasErrors()) {
             String errorMessages = bindingResult.getAllErrors()
@@ -130,11 +128,9 @@ public class AssetResource {
         }
 
         UUID uuid = UUID.fromString(id);
-        Asset asset = assetRepository.findOne(uuid);
-
-        if (asset == null) {
-            throw new NullPointerException("No such asset found.");
-        }
+        Asset asset = assetRepository
+                .findById(uuid)
+                .orElseThrow(() -> new NullPointerException("No such asset found."));
 
         assetRepository.delete(asset);
 
