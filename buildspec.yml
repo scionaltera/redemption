@@ -1,0 +1,27 @@
+version: 0.2
+
+env:
+  parameter-store:
+    DOCKER_HUB_USERNAME: "docker-hub-username"
+    DOCKER_HUB_PASSWORD: "docker-hub-password"
+
+phases:
+  install:
+    commands:
+      - chmod +x ./gradlew
+  pre_build:
+    commands:
+      - export PROJECT_VERSION=v`egrep "^version" build.gradle | cut -f2 -d\'`
+      - echo Project version is ${PROJECT_VERSION}
+      - docker login -u ${DOCKER_HUB_USERNAME} -p ${DOCKER_HUB_PASSWORD}
+  build:
+    commands:
+      - docker build -t scionaltera/redemption:latest -f src/main/docker/codebuild/Dockerfile .
+      - docker tag scionaltera/redemption:latest scionaltera/redemption:${PROJECT_VERSION}
+  post_build:
+    commands:
+      - docker push scionaltera/redemption:latest
+      - docker push scionaltera/redemption:${PROJECT_VERSION}
+      - printf '[{"name":"redemption","imageUri":"%s"}]' scionaltera/redemption:${PROJECT_VERSION} > imagedefinitions.json
+artifacts:
+  files: imagedefinitions.json
