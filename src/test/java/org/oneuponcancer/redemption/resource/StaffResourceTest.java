@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
@@ -214,7 +215,7 @@ public class StaffResourceTest {
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.EDIT_STAFF.name())));
         when(bCryptPasswordEncoder.encode(eq("secret"))).thenReturn("encrypted");
-        when(staffRepository.findOne(eq(uuid))).thenReturn(staff);
+        when(staffRepository.findById(eq(uuid))).thenReturn(Optional.of(staff));
         when(editRequest.getUsername()).thenReturn("admin");
         when(editRequest.getPassword()).thenReturn("secret");
         when(editRequest.getPermissions()).thenReturn(Arrays.asList(
@@ -249,7 +250,7 @@ public class StaffResourceTest {
         Staff staff = mock(Staff.class);
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.EDIT_STAFF.name())));
-        when(staffRepository.findOne(eq(uuid))).thenReturn(staff);
+        when(staffRepository.findById(eq(uuid))).thenReturn(Optional.of(staff));
         when(editRequest.getUsername()).thenReturn("admin");
         when(editRequest.getPermissions()).thenReturn(Arrays.asList(
                 Permission.LOGIN.getUnique(),
@@ -282,7 +283,7 @@ public class StaffResourceTest {
         StaffEditRequest editRequest = mock(StaffEditRequest.class);
         Staff staff = mock(Staff.class);
 
-        when(staffRepository.findOne(eq(uuid))).thenReturn(staff);
+        when(staffRepository.findById(eq(uuid))).thenReturn(Optional.of(staff));
         when(editRequest.getUsername()).thenReturn("admin");
         when(editRequest.getPassword()).thenReturn("secret");
         when(editRequest.getPermissions()).thenReturn(Arrays.asList(
@@ -332,7 +333,7 @@ public class StaffResourceTest {
         when(objectError.getDefaultMessage()).thenReturn("Invalid username.");
         when(bindingResult.hasErrors()).thenReturn(true);
         when(bindingResult.getAllErrors()).thenReturn(Collections.singletonList(objectError));
-        when(staffRepository.findOne(eq(uuid))).thenReturn(staff);
+        when(staffRepository.findById(eq(uuid))).thenReturn(Optional.of(staff));
         when(editRequest.getUsername()).thenReturn("");
         when(editRequest.getPassword()).thenReturn("secret");
         when(editRequest.getPermissions()).thenReturn(Arrays.asList(
@@ -360,7 +361,7 @@ public class StaffResourceTest {
         when(objectError.getDefaultMessage()).thenReturn("Invalid password.");
         when(bindingResult.hasErrors()).thenReturn(true);
         when(bindingResult.getAllErrors()).thenReturn(Collections.singletonList(objectError));
-        when(staffRepository.findOne(eq(uuid))).thenReturn(staff);
+        when(staffRepository.findById(eq(uuid))).thenReturn(Optional.of(staff));
         when(editRequest.getUsername()).thenReturn("admin");
         when(editRequest.getPassword()).thenReturn("");
         when(editRequest.getPermissions()).thenReturn(Arrays.asList(
@@ -383,7 +384,7 @@ public class StaffResourceTest {
         Staff staff = mock(Staff.class);
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.DELETE_STAFF.name())));
-        when(staffRepository.findOne(eq(uuid))).thenReturn(staff);
+        when(staffRepository.findById(eq(uuid))).thenReturn(Optional.of(staff));
 
         Staff result = staffResource.deleteStaff(
                 uuid.toString(),
@@ -392,7 +393,7 @@ public class StaffResourceTest {
         );
 
         assertEquals(staff, result);
-        verify(staffRepository).findOne(eq(uuid));
+        verify(staffRepository).findById(eq(uuid));
         verify(staffRepository).delete(eq(staff));
         verify(staffLoader).evaluateSecurity();
         verify(auditLogService).extractRemoteIp(eq(request));

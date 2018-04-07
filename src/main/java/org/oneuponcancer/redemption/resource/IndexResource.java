@@ -87,9 +87,9 @@ public class IndexResource {
         model.addAttribute("version", applicationVersion);
         model.addAttribute("secure", staffLoader.isSecure());
 
-        Staff staff = staffRepository.findByUsername(principal.getName());
-
-        model.addAttribute("staff", staff);
+        Staff staff = staffRepository
+                .findByUsername(principal.getName())
+                .orElse(null);
 
         if (staff != null) {
             List<String> activePermissions = new ArrayList<>();
@@ -102,6 +102,7 @@ public class IndexResource {
                 }
             });
 
+            model.addAttribute("staff", staff);
             model.addAttribute("permissions", activePermissions);
         }
 
@@ -127,11 +128,9 @@ public class IndexResource {
         }
 
         UUID uuid = UUID.fromString(id);
-        Staff staff = staffRepository.findOne(uuid);
-
-        if (staff == null) {
-            throw new IllegalArgumentException("No staff member with provided ID");
-        }
+        Staff staff = staffRepository
+                .findById(uuid)
+                .orElseThrow(() -> new IllegalArgumentException("No staff member with provided ID"));
 
         model.addAttribute("version", applicationVersion);
         model.addAttribute("permissions", Permission.values());
@@ -159,11 +158,9 @@ public class IndexResource {
         }
 
         UUID uuid = UUID.fromString(id);
-        Asset asset = assetRepository.findOne(uuid);
-
-        if (asset == null) {
-            throw new IllegalArgumentException("No asset with provided ID");
-        }
+        Asset asset = assetRepository
+                .findById(uuid)
+                .orElseThrow(() -> new IllegalArgumentException("No asset with provided ID"));
 
         model.addAttribute("version", applicationVersion);
         model.addAttribute("permissions", Permission.values());
@@ -191,11 +188,9 @@ public class IndexResource {
         }
 
         UUID uuid = UUID.fromString(id);
-        Participant participant = participantRepository.findOne(uuid);
-
-        if (participant == null) {
-            throw new IllegalArgumentException("No participant with provided ID");
-        }
+        Participant participant = participantRepository
+                .findById(uuid)
+                .orElseThrow(() -> new IllegalArgumentException("No participant with provided ID"));
 
         model.addAttribute("version", applicationVersion);
         model.addAttribute("permissions", Permission.values());

@@ -11,7 +11,7 @@ RUN cd /opt/build \
 && apk upgrade \
 && apk add --no-cache bash \
 && apk add libstdc++ \
-&& ./gradlew clean build
+&& ./gradlew --console=plain clean build -x buildDocker
 
 FROM frolvlad/alpine-oraclejre8:slim as run
 MAINTAINER Peter Keeler <peter@bonevm.com>

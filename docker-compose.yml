@@ -24,4 +24,4 @@ services:
      - "5005:5005"
     links:
      - postgres
-    env_file: secrets.env
+    env_file: redemption.env

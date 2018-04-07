@@ -1,3 +1,15 @@
+group 'org.oneuponcancer'
+version '0.8.0'
+
+apply plugin: 'java'
+apply plugin: 'info.solidsoft.pitest'
+apply plugin: 'docker'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
 buildscript {
     repositories {
         mavenCentral()
@@ -5,20 +17,10 @@ buildscript {
 
     dependencies {
         classpath group: 'se.transmode.gradle', name: 'gradle-docker', version: '1.2'
-        classpath group: 'org.springframework.boot', name: 'spring-boot-gradle-plugin', version: '1.5.6.RELEASE'
+        classpath group: 'org.springframework.boot', name: 'spring-boot-gradle-plugin', version: '2.0.0.RELEASE'
         classpath group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: '1.1.11'
     }
 }
-
-group 'org.oneuponcancer'
-
-apply plugin: 'java'
-apply plugin: 'info.solidsoft.pitest'
-apply plugin: 'docker'
-apply plugin: 'org.springframework.boot'
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
@@ -29,12 +31,12 @@ configurations.compile {
 }
 
 dependencies {
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '1.5.6.RELEASE'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-jetty', version: '1.5.6.RELEASE'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: '1.5.6.RELEASE'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-freemarker', version: '1.5.6.RELEASE'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '1.5.6.RELEASE'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '1.5.6.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-jetty'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-freemarker'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-security'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
 
     compile group: 'javax.inject', name: 'javax.inject', version: '1'
     compile group: 'org.apache.commons', name: 'commons-text', version: '1.1'
@@ -44,6 +46,15 @@ dependencies {
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile group: 'org.mockito', name: 'mockito-all', version: '1.10.19'
+}
+
+bootJar {
+    manifest {
+        attributes(
+                "Implementation-Title": rootProject.name,
+                "Implementation-Version": version
+        )
+    }
 }
 
 pitest {
@@ -66,7 +77,7 @@ jar {
     }
 }
 
-task buildDocker(type: Docker, dependsOn: build) {
+task buildDocker(type: Docker) {
     push = false
     applicationName = jar.getBaseName()
     dockerfile = file('src/main/docker/local/Dockerfile')
@@ -81,4 +92,5 @@ task buildDocker(type: Docker, dependsOn: build) {
     }
 }
 
+build.dependsOn project.tasks.buildDocker
 test.finalizedBy project.tasks.pitest

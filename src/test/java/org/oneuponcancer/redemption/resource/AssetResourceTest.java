@@ -23,6 +23,7 @@ import javax.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
@@ -178,7 +179,7 @@ public class AssetResourceTest {
         Asset asset = mock(Asset.class);
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.EDIT_ASSET.name())));
-        when(assetRepository.findOne(eq(uuid))).thenReturn(asset);
+        when(assetRepository.findById(eq(uuid))).thenReturn(Optional.of(asset));
         when(editRequest.getName()).thenReturn("Foop");
         when(editRequest.getDescription()).thenReturn("A big bag of foop.");
 
@@ -204,7 +205,7 @@ public class AssetResourceTest {
         AssetEditRequest editRequest = mock(AssetEditRequest.class);
         Asset asset = mock(Asset.class);
 
-        when(assetRepository.findOne(eq(uuid))).thenReturn(asset);
+        when(assetRepository.findById(eq(uuid))).thenReturn(Optional.of(asset));
         when(editRequest.getName()).thenReturn("Carp");
         when(editRequest.getDescription()).thenReturn("A bucket of carp.");
 
@@ -246,7 +247,7 @@ public class AssetResourceTest {
         when(objectError.getDefaultMessage()).thenReturn("Invalid name.");
         when(bindingResult.hasErrors()).thenReturn(true);
         when(bindingResult.getAllErrors()).thenReturn(Collections.singletonList(objectError));
-        when(assetRepository.findOne(eq(uuid))).thenReturn(asset);
+        when(assetRepository.findById(eq(uuid))).thenReturn(Optional.of(asset));
         when(editRequest.getName()).thenReturn("");
         when(editRequest.getDescription()).thenReturn("A bucket of carp.");
 
@@ -270,7 +271,7 @@ public class AssetResourceTest {
         when(objectError.getDefaultMessage()).thenReturn("Invalid description.");
         when(bindingResult.hasErrors()).thenReturn(true);
         when(bindingResult.getAllErrors()).thenReturn(Collections.singletonList(objectError));
-        when(assetRepository.findOne(eq(uuid))).thenReturn(asset);
+        when(assetRepository.findById(eq(uuid))).thenReturn(Optional.of(asset));
         when(editRequest.getName()).thenReturn("Carp");
         when(editRequest.getDescription()).thenReturn("");
 
@@ -289,7 +290,7 @@ public class AssetResourceTest {
         Asset asset = mock(Asset.class);
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.DELETE_ASSET.name())));
-        when(assetRepository.findOne(eq(uuid))).thenReturn(asset);
+        when(assetRepository.findById(eq(uuid))).thenReturn(Optional.of(asset));
 
         Asset result = assetResource.deleteAsset(
                 uuid.toString(),
@@ -298,7 +299,7 @@ public class AssetResourceTest {
         );
 
         assertEquals(asset, result);
-        verify(assetRepository).findOne(eq(uuid));
+        verify(assetRepository).findById(eq(uuid));
         verify(assetRepository).delete(eq(asset));
         verify(auditLogService).extractRemoteIp(eq(request));
         verify(auditLogService).log(anyString(), anyString(), anyString());

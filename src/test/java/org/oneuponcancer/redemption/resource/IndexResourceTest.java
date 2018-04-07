@@ -19,6 +19,7 @@ import org.springframework.ui.Model;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
@@ -126,7 +127,7 @@ public class IndexResourceTest {
                 new SimpleGrantedAuthority(Permission.DELETE_STAFF.name()),
                 new SimpleGrantedAuthority(Permission.READ_LOGS.name())
         ));
-        when(staffRepository.findByUsername(eq("admin"))).thenReturn(staff);
+        when(staffRepository.findByUsername(eq("admin"))).thenReturn(Optional.of(staff));
 
         String result = indexResource.dashboard(principal, model);
 
@@ -151,7 +152,7 @@ public class IndexResourceTest {
                 new SimpleGrantedAuthority(Permission.DELETE_STAFF.name()),
                 new SimpleGrantedAuthority(Permission.READ_LOGS.name())
         ));
-        when(staffRepository.findByUsername(eq("admin"))).thenReturn(staff);
+        when(staffRepository.findByUsername(eq("admin"))).thenReturn(Optional.of(staff));
 
         String result = indexResource.dashboard(principal, model);
 
@@ -176,7 +177,7 @@ public class IndexResourceTest {
                 new SimpleGrantedAuthority(Permission.DELETE_STAFF.name()),
                 new SimpleGrantedAuthority(Permission.READ_LOGS.name())
         ));
-        when(staffRepository.findByUsername(eq("admin"))).thenReturn(staff);
+        when(staffRepository.findByUsername(eq("admin"))).thenReturn(Optional.of(staff));
 
         String result = indexResource.dashboard(principal, model);
 
@@ -201,7 +202,7 @@ public class IndexResourceTest {
                 new SimpleGrantedAuthority(Permission.DELETE_STAFF.name()),
                 new SimpleGrantedAuthority(Permission.READ_LOGS.name())
         ));
-        when(staffRepository.findByUsername(eq("admin"))).thenReturn(staff);
+        when(staffRepository.findByUsername(eq("admin"))).thenReturn(Optional.of(staff));
 
         String result = indexResource.dashboard(principal, model);
 
@@ -226,7 +227,7 @@ public class IndexResourceTest {
                 new SimpleGrantedAuthority(Permission.CREATE_STAFF.name()),
                 new SimpleGrantedAuthority(Permission.READ_LOGS.name())
         ));
-        when(staffRepository.findByUsername(eq("admin"))).thenReturn(staff);
+        when(staffRepository.findByUsername(eq("admin"))).thenReturn(Optional.of(staff));
 
         String result = indexResource.dashboard(principal, model);
 
@@ -251,7 +252,7 @@ public class IndexResourceTest {
                 new SimpleGrantedAuthority(Permission.CREATE_STAFF.name()),
                 new SimpleGrantedAuthority(Permission.DELETE_STAFF.name())
         ));
-        when(staffRepository.findByUsername(eq("admin"))).thenReturn(staff);
+        when(staffRepository.findByUsername(eq("admin"))).thenReturn(Optional.of(staff));
 
         String result = indexResource.dashboard(principal, model);
 
@@ -290,7 +291,7 @@ public class IndexResourceTest {
     public void testEditStaff() {
         UUID uuid = UUID.randomUUID();
 
-        when(staffRepository.findOne(eq(uuid))).thenReturn(staff);
+        when(staffRepository.findById(eq(uuid))).thenReturn(Optional.of(staff));
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(
                 new SimpleGrantedAuthority(Permission.EDIT_STAFF.name())
         ));
@@ -343,7 +344,7 @@ public class IndexResourceTest {
     public void testEditAsset() {
         UUID uuid = UUID.randomUUID();
 
-        when(assetRepository.findOne(eq(uuid))).thenReturn(asset);
+        when(assetRepository.findById(eq(uuid))).thenReturn(Optional.of(asset));
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(
                 new SimpleGrantedAuthority(Permission.EDIT_ASSET.name())
         ));
@@ -396,7 +397,7 @@ public class IndexResourceTest {
     public void testEditParticipant() {
         UUID uuid = UUID.randomUUID();
 
-        when(participantRepository.findOne(eq(uuid))).thenReturn(participant);
+        when(participantRepository.findById(eq(uuid))).thenReturn(Optional.of(participant));
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(
                 new SimpleGrantedAuthority(Permission.EDIT_PARTICIPANT.name())
         ));

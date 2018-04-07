@@ -110,11 +110,9 @@ public class StaffResource {
         }
 
         UUID uuid = UUID.fromString(id);
-        Staff staff = staffRepository.findOne(uuid);
-
-        if (staff == null) {
-            throw new NullPointerException("No such staff account found.");
-        }
+        Staff staff = staffRepository
+                .findById(uuid)
+                .orElseThrow(() -> new NullPointerException("No such staff account found."));
 
         if (bindingResult.hasErrors()) {
             String errorMessages = bindingResult.getAllErrors()
@@ -155,11 +153,9 @@ public class StaffResource {
         }
 
         UUID uuid = UUID.fromString(id);
-        Staff staff = staffRepository.findOne(uuid);
-
-        if (staff == null) {
-            throw new NullPointerException("No such staff account found.");
-        }
+        Staff staff = staffRepository
+                .findById(uuid)
+                .orElseThrow(() -> new NullPointerException("No such staff account found."));
 
         staffRepository.delete(staff);
         staffLoader.evaluateSecurity();

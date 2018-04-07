@@ -2,7 +2,6 @@
 .gradle/
 build/
 out/
-secrets.env
 credentials.env
 codeship.aes
 dockercfg
