@@ -1,4 +1,0 @@
-redemption:
-  build:
-    image: scionaltera/redemption
-    dockerfile: src/main/docker/codeship/Dockerfile
