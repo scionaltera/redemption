@@ -12,7 +12,7 @@
 <body>
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-12">
+        <div class="col">
             <div id="participant-create-form">
                 <h1>Create Participant</h1>
                 <form action="<@spring.url '/api/v1/participant'/>" method="post">
@@ -39,7 +39,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-12">
+        <div class="col">
         <#include "copyright.inc.ftl">
         </div>
     </div>

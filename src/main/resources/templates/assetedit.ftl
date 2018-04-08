@@ -12,7 +12,7 @@
 <body>
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-12">
+        <div class="col">
             <div id="asset-edit-form">
                 <h1>Edit Asset</h1>
                 <form action="<@spring.url '/api/v1/asset/${asset.id}'/>" method="post">
@@ -35,7 +35,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-12">
+        <div class="col">
         <#include "copyright.inc.ftl">
         </div>
     </div>
