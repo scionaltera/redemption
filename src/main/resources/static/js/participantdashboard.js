@@ -11,7 +11,7 @@ $(document).ready(function() {
             $.each(data, function() {
                 messages.push(
                     "<tr><td>" + this.firstName + "</td><td>" + this.lastName + "</td><td>" + this.email + "</td><td>" +
-                    "<button class='btn btn-default btn-edit' data-participant-id='" + this.id + "' " + ($permEditParticipant.length === 0 ? "disabled" : "") + ">Edit</button>" +
+                    "<button class='btn btn-light btn-edit' data-participant-id='" + this.id + "' " + ($permEditParticipant.length === 0 ? "disabled" : "") + ">Edit</button>" +
                     "<button class='btn btn-danger btn-delete' data-participant-id='" + this.id + "' " + ($permDeleteParticipant.length === 0 ? "disabled" : "") + ">Delete</button>" +
                     "</td></tr>");
             });

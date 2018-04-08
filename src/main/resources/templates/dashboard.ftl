@@ -13,7 +13,7 @@
 <div class="container-fluid">
 <#if secure == false>
     <div class="row">
-        <div class="col-md-12">
+        <div class="col">
             <div id="security-box-inner" class="box-inner">
             <span>Warning! The default staff account is enabled, which presents a security risk because it uses a
                 username and password that are publicly available on GitHub. Please either delete the account or
@@ -23,7 +23,7 @@
     </div>
 </#if>
     <div class="row">
-        <div id="auth-box-outer" class="col-md-12">
+        <div id="auth-box-outer" class="col">
             <div id="auth-box-inner" class="box-inner">
                 <form action="<@spring.url '/logout'/>" method="post">
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
@@ -34,7 +34,7 @@
     </div>
 <#if list\-participant??>
     <div class="row">
-        <div id="participant-box-outer" class="col-md-12">
+        <div id="participant-box-outer" class="col">
             <div id="participant-box-inner" class="box-inner">
                 <p>Participants <button id="participant-button-create" class="btn btn-success" <#if create\-participant??><#else>disabled</#if>>Create</button></p>
                 <table id="participant-box-content" class="table">
@@ -46,7 +46,7 @@
 </#if>
 <#if list\-asset??>
     <div class="row">
-        <div id="asset-box-outer" class="col-md-12">
+        <div id="asset-box-outer" class="col">
             <div id="asset-box-inner" class="box-inner">
                 <p>Assets <button id="asset-button-create" class="btn btn-success" <#if create\-asset??><#else>disabled</#if>>Create</button></p>
                 <table id="asset-box-content" class="table">
@@ -58,7 +58,7 @@
 </#if>
 <#if list\-staff??>
     <div class="row">
-        <div id="perm-box-outer" class="col-md-6">
+        <div id="perm-box-outer" class="col">
             <div id="perm-box-inner" class="box-inner">
                 <p>Permissions for ${staff.username?capitalize}</p>
                 <ul>
@@ -69,7 +69,7 @@
             </div>
         </div>
 
-        <div id="staff-box-outer" class="col-md-6">
+        <div id="staff-box-outer" class="col">
             <div id="staff-box-inner" class="box-inner">
                 <p>Staff Editor <button id="staff-button-create" class="btn btn-success" <#if create\-staff??><#else>disabled</#if>>Create</button></p>
                 <table id="staff-box-content" class="table">
@@ -81,7 +81,7 @@
 </#if>
 <#if read\-logs??>
     <div class="row">
-        <div id="log-box-outer" class="col-md-12">
+        <div id="log-box-outer" class="col">
             <div id="log-box-inner" class="box-inner">
                 <p>Audit Log</p>
                 <div id="log-box-content"></div>
@@ -90,7 +90,7 @@
     </div>
 </#if>
     <div class="row">
-        <div class="col-md-12">
+        <div class="col">
         <#include "copyright.inc.ftl">
         </div>
     </div>
