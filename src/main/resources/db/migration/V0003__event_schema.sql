@@ -1,0 +1,8 @@
+CREATE TABLE event (
+  id UUID NOT NULL,
+  name CHARACTER VARYING(255),
+  description CHARACTER VARYING(255),
+  start_date TIMESTAMP WITH TIME ZONE,
+  end_date TIMESTAMP WITH TIME ZONE,
+  PRIMARY KEY (id)
+);

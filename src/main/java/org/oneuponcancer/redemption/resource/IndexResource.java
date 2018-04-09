@@ -4,10 +4,12 @@ package org.oneuponcancer.redemption.resource;
 import org.oneuponcancer.redemption.exception.InsufficientPermissionException;
 import org.oneuponcancer.redemption.loader.StaffLoader;
 import org.oneuponcancer.redemption.model.Asset;
+import org.oneuponcancer.redemption.model.Event;
 import org.oneuponcancer.redemption.model.Participant;
 import org.oneuponcancer.redemption.model.Permission;
 import org.oneuponcancer.redemption.model.Staff;
 import org.oneuponcancer.redemption.repository.AssetRepository;
+import org.oneuponcancer.redemption.repository.EventRepository;
 import org.oneuponcancer.redemption.repository.ParticipantRepository;
 import org.oneuponcancer.redemption.repository.StaffRepository;
 import org.slf4j.Logger;
@@ -39,18 +41,21 @@ public class IndexResource {
     private StaffRepository staffRepository;
     private AssetRepository assetRepository;
     private ParticipantRepository participantRepository;
+    private EventRepository eventRepository;
 
     @Inject
     public IndexResource(String applicationVersion,
                          StaffLoader staffLoader,
                          StaffRepository staffRepository,
                          AssetRepository assetRepository,
-                         ParticipantRepository participantRepository) {
+                         ParticipantRepository participantRepository,
+                         EventRepository eventRepository) {
         this.applicationVersion = applicationVersion;
         this.staffLoader = staffLoader;
         this.staffRepository = staffRepository;
         this.assetRepository = assetRepository;
         this.participantRepository = participantRepository;
+        this.eventRepository = eventRepository;
     }
 
     @RequestMapping("/")
@@ -167,6 +172,36 @@ public class IndexResource {
         model.addAttribute("asset", asset);
 
         return "assetedit";
+    }
+
+    @RequestMapping("/event")
+    public String createEvent(Principal principal, Model model) {
+        if (((UsernamePasswordAuthenticationToken)principal).getAuthorities().stream().noneMatch(a -> a.getAuthority().equals(Permission.CREATE_EVENT.name()))) {
+            throw new InsufficientPermissionException("Not allowed to create events.");
+        }
+
+        model.addAttribute("version", applicationVersion);
+        model.addAttribute("permissions", Permission.values());
+
+        return "eventcreate";
+    }
+
+    @RequestMapping("/event/{id}")
+    public String editEvent(Principal principal, Model model, @PathVariable String id) {
+        if (((UsernamePasswordAuthenticationToken)principal).getAuthorities().stream().noneMatch(a -> a.getAuthority().equals(Permission.EDIT_EVENT.name()))) {
+            throw new InsufficientPermissionException("Not allowed to list events.");
+        }
+
+        UUID uuid = UUID.fromString(id);
+        Event event = eventRepository
+                .findById(uuid)
+                .orElseThrow(() -> new IllegalArgumentException("No event with provided ID"));
+
+        model.addAttribute("version", applicationVersion);
+        model.addAttribute("permissions", Permission.values());
+        model.addAttribute("event", event);
+
+        return "eventedit";
     }
 
     @RequestMapping("/participant")

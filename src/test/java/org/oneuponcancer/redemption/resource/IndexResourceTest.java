@@ -7,10 +7,12 @@ import org.mockito.MockitoAnnotations;
 import org.oneuponcancer.redemption.exception.InsufficientPermissionException;
 import org.oneuponcancer.redemption.loader.StaffLoader;
 import org.oneuponcancer.redemption.model.Asset;
+import org.oneuponcancer.redemption.model.Event;
 import org.oneuponcancer.redemption.model.Participant;
 import org.oneuponcancer.redemption.model.Permission;
 import org.oneuponcancer.redemption.model.Staff;
 import org.oneuponcancer.redemption.repository.AssetRepository;
+import org.oneuponcancer.redemption.repository.EventRepository;
 import org.oneuponcancer.redemption.repository.ParticipantRepository;
 import org.oneuponcancer.redemption.repository.StaffRepository;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -47,10 +49,16 @@ public class IndexResourceTest {
     private ParticipantRepository participantRepository;
 
     @Mock
+    private EventRepository eventRepository;
+
+    @Mock
     private Staff staff;
 
     @Mock
     private Asset asset;
+
+    @Mock
+    private Event event;
 
     @Mock
     private Participant participant;
@@ -66,7 +74,8 @@ public class IndexResourceTest {
                 staffLoader,
                 staffRepository,
                 assetRepository,
-                participantRepository);
+                participantRepository,
+                eventRepository);
     }
 
     @Test
@@ -372,6 +381,59 @@ public class IndexResourceTest {
         ));
 
         indexResource.editAsset(principal, model, id);
+    }
+
+    @Test
+    public void testCreateEvent() {
+        when(principal.getAuthorities()).thenReturn(Collections.singletonList(
+                new SimpleGrantedAuthority(Permission.CREATE_EVENT.name())
+        ));
+
+        String result = indexResource.createEvent(principal, model);
+
+        assertEquals("eventcreate", result);
+
+        verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
+        verify(model).addAttribute(eq("permissions"), anyCollectionOf(Permission.class));
+    }
+
+    @Test(expected = InsufficientPermissionException.class)
+    public void testCreateEventNoPermission() {
+        indexResource.createEvent(principal, model);
+    }
+
+    @Test
+    public void testEditEvent() {
+        UUID uuid = UUID.randomUUID();
+
+        when(eventRepository.findById(eq(uuid))).thenReturn(Optional.of(event));
+        when(principal.getAuthorities()).thenReturn(Collections.singletonList(
+                new SimpleGrantedAuthority(Permission.EDIT_EVENT.name())
+        ));
+
+        String result = indexResource.editEvent(principal, model, uuid.toString());
+
+        assertEquals("eventedit", result);
+
+        verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
+        verify(model).addAttribute(eq("permissions"), anyCollectionOf(Permission.class));
+        verify(model).addAttribute(eq("event"), any(Event.class));
+    }
+
+    @Test(expected = InsufficientPermissionException.class)
+    public void testEditEventNoPermission() {
+        indexResource.editEvent(principal, model, "event_id");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testEditEventNoSuchId() {
+        String id = "bogus_event_id";
+
+        when(principal.getAuthorities()).thenReturn(Collections.singletonList(
+                new SimpleGrantedAuthority(Permission.EDIT_EVENT.name())
+        ));
+
+        indexResource.editEvent(principal, model, id);
     }
 
     @Test

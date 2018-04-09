@@ -50,7 +50,19 @@
             <div id="asset-box-inner" class="box-inner">
                 <p>Assets <button id="asset-button-create" class="btn btn-success" <#if create\-asset??><#else>disabled</#if>>Create</button></p>
                 <table id="asset-box-content" class="table">
-                    <tr><th>Name</th><th>ID</th><th>Actions</th></tr>
+                    <tr><th>Name</th><th>Actions</th></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</#if>
+<#if list\-event??>
+    <div class="row">
+        <div id="event-box-outer" class="col">
+            <div id="event-box-inner" class="box-inner">
+                <p>Events <button id="event-button-create" class="btn btn-success" <#if create\-event??><#else>disabled</#if>>Create</button></p>
+                <table id="event-box-content" class="table">
+                    <tr><th>Name</th><th>Start Date</th><th>End Date</th><th>Actions</th></tr>
                 </table>
             </div>
         </div>
@@ -107,5 +119,6 @@
 <script type="text/javascript" src="<@spring.url 'js/participantdashboard.js'/>"></script>
 <script type="text/javascript" src="<@spring.url 'js/staffdashboard.js'/>"></script>
 <script type="text/javascript" src="<@spring.url 'js/assetdashboard.js'/>"></script>
+<script type="text/javascript" src="<@spring.url 'js/eventdashboard.js'/>"></script>
 </body>
 </html>
