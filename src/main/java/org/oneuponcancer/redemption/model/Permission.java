@@ -14,7 +14,11 @@ public enum Permission {
     CREATE_ASSET("create-asset", "Can create assets"),
     LIST_ASSET("list-asset", "Can list assets"),
     EDIT_ASSET("edit-asset", "Can edit assets"),
-    DELETE_ASSET("delete-asset", "Can delete assets");
+    DELETE_ASSET("delete-asset", "Can delete assets"),
+    CREATE_EVENT("create-event", "Can create events"),
+    LIST_EVENT("list-event", "Can list events"),
+    EDIT_EVENT("edit-event", "Can edit events"),
+    DELETE_EVENT("delete-event", "Can delete events");
 
     private String unique;
     private String description;
