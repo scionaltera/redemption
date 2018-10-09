@@ -9,19 +9,20 @@
 
 version: "2"
 services:
-  postgres:
-    image: postgres:9.6
+  rds:
+    image: mysql:5.6
     ports:
-     - "5432:5432"
+     - "3306:3306"
     environment:
-      POSTGRES_USER: redemption
-      POSTGRES_PASSWORD: redemption
-      POSTGRES_DB: redemption
+      MYSQL_ROOT_PASSWORD: redemption
+      MYSQL_DATABASE: redemption
+      MYSQL_USER: redemption
+      MYSQL_PASSWORD: redemption
   redemption:
     image: scionaltera/redemption:latest
     ports:
      - "8080:8080"
      - "5005:5005"
-    links:
-     - postgres
+    depends_on:
+     - rds
     env_file: redemption.env
