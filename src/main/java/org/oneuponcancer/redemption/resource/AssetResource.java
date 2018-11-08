@@ -1,11 +1,14 @@
 package org.oneuponcancer.redemption.resource;
 
+import org.oneuponcancer.redemption.exception.IdNotFoundException;
 import org.oneuponcancer.redemption.exception.InsufficientPermissionException;
 import org.oneuponcancer.redemption.model.Asset;
+import org.oneuponcancer.redemption.model.Event;
 import org.oneuponcancer.redemption.model.Permission;
 import org.oneuponcancer.redemption.model.transport.AssetCreateRequest;
 import org.oneuponcancer.redemption.model.transport.AssetEditRequest;
 import org.oneuponcancer.redemption.repository.AssetRepository;
+import org.oneuponcancer.redemption.repository.EventRepository;
 import org.oneuponcancer.redemption.service.AuditLogService;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
@@ -33,11 +36,16 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/asset")
 public class AssetResource {
     private AssetRepository assetRepository;
+    private EventRepository eventRepository;
     private AuditLogService auditLogService;
 
     @Inject
-    public AssetResource(AssetRepository assetRepository, AuditLogService auditLogService) {
+    public AssetResource(
+            AssetRepository assetRepository,
+            EventRepository eventRepository,
+            AuditLogService auditLogService) {
         this.assetRepository = assetRepository;
+        this.eventRepository = eventRepository;
         this.auditLogService = auditLogService;
     }
 
@@ -71,6 +79,11 @@ public class AssetResource {
 
         asset.setName(assetCreateRequest.getName());
         asset.setDescription(assetCreateRequest.getDescription());
+
+        Event event = eventRepository.findById(assetCreateRequest.getEventId())
+                .orElseThrow(() -> new IdNotFoundException(assetCreateRequest.getEventId(), "Event not found."));
+
+        asset.setEvent(event);
 
         Asset savedAsset = assetRepository.save(asset);
 
@@ -107,6 +120,11 @@ public class AssetResource {
 
         asset.setName(assetEditRequest.getName());
         asset.setDescription(assetEditRequest.getDescription());
+
+        Event event = eventRepository.findById(assetEditRequest.getEventId())
+                .orElseThrow(() -> new IdNotFoundException(assetEditRequest.getEventId(), "Event not found."));
+
+        asset.setEvent(event);
 
         Asset savedAsset = assetRepository.save(asset);
 

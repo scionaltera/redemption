@@ -20,6 +20,7 @@ services:
       MYSQL_PASSWORD: redemption
   redemption:
     image: scionaltera/redemption:latest
+    tty: on
     ports:
      - "8080:8080"
      - "5005:5005"

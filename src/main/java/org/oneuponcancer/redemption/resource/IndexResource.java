@@ -150,8 +150,11 @@ public class IndexResource {
             throw new InsufficientPermissionException("Not allowed to create assets.");
         }
 
+        List<Event> events = eventRepository.findAll();
+
         model.addAttribute("version", applicationVersion);
         model.addAttribute("permissions", Permission.values());
+        model.addAttribute("events", events);
 
         return "assetcreate";
     }
@@ -167,8 +170,11 @@ public class IndexResource {
                 .findById(uuid)
                 .orElseThrow(() -> new IllegalArgumentException("No asset with provided ID"));
 
+        List<Event> events = eventRepository.findAll();
+
         model.addAttribute("version", applicationVersion);
         model.addAttribute("permissions", Permission.values());
+        model.addAttribute("events", events);
         model.addAttribute("asset", asset);
 
         return "assetedit";
