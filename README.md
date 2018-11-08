@@ -2,7 +2,7 @@
 ![AWS CodeBuild](https://codebuild.us-west-2.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoibTY4T2JxQ2IvQ0YybURlS0VDNXZ5YXFyU2ozZVhhMldJZ0FEd1V5dzhXalUrdVhhK2h3eHh5UW1SeXo0MG9OVy9HQmpNYnlUY09CSStOSHQyYTlzc0lBPSIsIml2UGFyYW1ldGVyU3BlYyI6IlU3WG5BMTdEQi95cVlvcjciLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master)
 [![Website](https://img.shields.io/website/https/redemption.bonevm.com.svg?label=website "Website")](https://redemption.bonevm.com)  
 ## Introduction
-Redemption is a platform for the folks at [1UpOnCancer](https://1uponcancer.org) to use to manage the competitions and giveaways they do. They have to manage a lot of Steam keys and other prizes, participants and events and needed a database to help with that. I have decided to make it an open source project in case there are other organizations that need a similar way to organize their contest assets.
+Redemption is a platform for the folks at [1UpOnCancer](http://www.1uponcancer.org/) to use to manage the competitions and giveaways they do. They have to manage a lot of Steam keys and other prizes, participants and events and needed a database to help with that. I have decided to make it an open source project in case there are other organizations that need a similar way to organize their contest assets.
 
 ## Running
 ### Locally
@@ -12,7 +12,7 @@ docker-compose up
 ```
 
 ### Deployed
-To deploy a production version of Redemption you will need a database. Redemption is only tested using PostgreSQL, but other databases should work if they are compatible with Spring Data JPA. You may need to modify the SQL scripts under `src/main/resources/db/migration` if they contain any PostgreSQL specific features that don't work on your database.
+To deploy a production version of Redemption you will need a database. Redemption is only tested using MySQL because that is what our production deployment uses, but other databases should work if they are compatible with Spring Data JPA. You may need to modify the SQL scripts under `src/main/resources/db/migration` because they may contain features specific to MySQL that don't work on your database.
 
 You will need to change the values in `redemption.env` to point at the database you have set up, and you will either need to deploy the Redemption Docker container in a service like ECS or Kubernetes, or run the executable JAR on your server. It has Jetty embedded in it, so you shouldn't need to install anything else except Java 8.
 
