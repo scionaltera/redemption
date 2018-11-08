@@ -27,8 +27,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
 public class AssetResourceTest {
@@ -64,7 +62,7 @@ public class AssetResourceTest {
 
         when(assetRepository.findAll()).thenReturn(allAssets);
         when(assetRepository.save(any(Asset.class))).thenAnswer(i -> {
-            Asset asset = i.getArgumentAt(0, Asset.class);
+            Asset asset = i.getArgument(0);
 
             asset.setId(UUID.randomUUID());
 
@@ -108,7 +106,7 @@ public class AssetResourceTest {
         assertNotNull(response);
         verify(assetRepository).save(assetArgumentCaptor.capture());
         verify(auditLogService).extractRemoteIp(eq(request));
-        verify(auditLogService).log(anyString(), anyString(), anyString());
+        verify(auditLogService).log(any(), any(), anyString());
 
         Asset asset = assetArgumentCaptor.getValue();
 
@@ -196,7 +194,7 @@ public class AssetResourceTest {
         verify(asset).setDescription(eq("A big bag of foop."));
         verify(assetRepository).save(eq(asset));
         verify(auditLogService).extractRemoteIp(eq(request));
-        verify(auditLogService).log(anyString(), anyString(), anyString());
+        verify(auditLogService).log(any(), any(), anyString());
     }
 
     @Test(expected = InsufficientPermissionException.class)
@@ -302,7 +300,7 @@ public class AssetResourceTest {
         verify(assetRepository).findById(eq(uuid));
         verify(assetRepository).delete(eq(asset));
         verify(auditLogService).extractRemoteIp(eq(request));
-        verify(auditLogService).log(anyString(), anyString(), anyString());
+        verify(auditLogService).log(any(), any(), anyString());
     }
 
     @Test(expected = InsufficientPermissionException.class)

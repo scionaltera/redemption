@@ -27,8 +27,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
 public class ParticipantResourceTest {
@@ -64,7 +62,7 @@ public class ParticipantResourceTest {
 
         when(participantRepository.findAll()).thenReturn(allParticipants);
         when(participantRepository.save(any(Participant.class))).thenAnswer(i -> {
-            Participant participant = i.getArgumentAt(0, Participant.class);
+            Participant participant = i.getArgument(0);
 
             participant.setId(UUID.randomUUID());
 
@@ -109,7 +107,7 @@ public class ParticipantResourceTest {
         assertNotNull(response);
         verify(participantRepository).save(participantArgumentCaptor.capture());
         verify(auditLogService).extractRemoteIp(eq(request));
-        verify(auditLogService).log(anyString(), anyString(), anyString());
+        verify(auditLogService).log(any(), any(), anyString());
 
         Participant participant = participantArgumentCaptor.getValue();
 
@@ -203,7 +201,7 @@ public class ParticipantResourceTest {
         verify(participant).setEmail(eq("first@lasterson.com"));
         verify(participantRepository).save(eq(participant));
         verify(auditLogService).extractRemoteIp(eq(request));
-        verify(auditLogService).log(anyString(), anyString(), anyString());
+        verify(auditLogService).log(any(), any(), anyString());
     }
 
     @Test(expected = InsufficientPermissionException.class)
@@ -313,7 +311,7 @@ public class ParticipantResourceTest {
         verify(participantRepository).findById(eq(uuid));
         verify(participantRepository).delete(eq(participant));
         verify(auditLogService).extractRemoteIp(eq(request));
-        verify(auditLogService).log(anyString(), anyString(), anyString());
+        verify(auditLogService).log(any(), any(), anyString());
     }
 
     @Test(expected = InsufficientPermissionException.class)

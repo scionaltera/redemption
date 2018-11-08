@@ -288,7 +288,7 @@ public class IndexResourceTest {
         assertEquals("staffcreate", result);
 
         verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
-        verify(model).addAttribute(eq("permissions"), anyCollectionOf(Permission.class));
+        verify(model).addAttribute(eq("permissions"), any(Permission[].class));
     }
 
     @Test(expected = InsufficientPermissionException.class)
@@ -310,7 +310,7 @@ public class IndexResourceTest {
         assertEquals("staffedit", result);
 
         verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
-        verify(model).addAttribute(eq("permissions"), anyCollectionOf(Permission.class));
+        verify(model).addAttribute(eq("permissions"), any(Permission[].class));
         verify(model).addAttribute(eq("staff"), any(Staff.class));
     }
 
@@ -341,7 +341,7 @@ public class IndexResourceTest {
         assertEquals("assetcreate", result);
 
         verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
-        verify(model).addAttribute(eq("permissions"), anyCollectionOf(Permission.class));
+        verify(model).addAttribute(eq("permissions"), any(Permission[].class));
     }
 
     @Test(expected = InsufficientPermissionException.class)
@@ -363,7 +363,7 @@ public class IndexResourceTest {
         assertEquals("assetedit", result);
 
         verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
-        verify(model).addAttribute(eq("permissions"), anyCollectionOf(Permission.class));
+        verify(model).addAttribute(eq("permissions"), any(Permission[].class));
         verify(model).addAttribute(eq("asset"), any(Asset.class));
     }
 
@@ -394,7 +394,7 @@ public class IndexResourceTest {
         assertEquals("eventcreate", result);
 
         verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
-        verify(model).addAttribute(eq("permissions"), anyCollectionOf(Permission.class));
+        verify(model).addAttribute(eq("permissions"), any(Permission[].class));
     }
 
     @Test(expected = InsufficientPermissionException.class)
@@ -416,7 +416,7 @@ public class IndexResourceTest {
         assertEquals("eventedit", result);
 
         verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
-        verify(model).addAttribute(eq("permissions"), anyCollectionOf(Permission.class));
+        verify(model).addAttribute(eq("permissions"), any(Permission[].class));
         verify(model).addAttribute(eq("event"), any(Event.class));
     }
 
@@ -447,7 +447,7 @@ public class IndexResourceTest {
         assertEquals("participantcreate", result);
 
         verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
-        verify(model).addAttribute(eq("permissions"), anyCollectionOf(Permission.class));
+        verify(model).addAttribute(eq("permissions"), any(Permission[].class));
     }
 
     @Test(expected = InsufficientPermissionException.class)
@@ -469,7 +469,7 @@ public class IndexResourceTest {
         assertEquals("participantedit", result);
 
         verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
-        verify(model).addAttribute(eq("permissions"), anyCollectionOf(Permission.class));
+        verify(model).addAttribute(eq("permissions"), any(Permission[].class));
         verify(model).addAttribute(eq("participant"), any(Participant.class));
     }
 
