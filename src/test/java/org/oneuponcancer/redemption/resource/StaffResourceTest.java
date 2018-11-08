@@ -32,8 +32,6 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
 public class StaffResourceTest {
@@ -75,7 +73,7 @@ public class StaffResourceTest {
 
         when(staffRepository.findAll()).thenReturn(allStaff);
         when(staffRepository.save(any(Staff.class))).thenAnswer(i -> {
-            Staff staff = i.getArgumentAt(0, Staff.class);
+            Staff staff = i.getArgument(0);
 
             staff.setId(UUID.randomUUID());
 
@@ -130,7 +128,7 @@ public class StaffResourceTest {
         verify(staffRepository).save(staffArgumentCaptor.capture());
         verify(staffLoader).evaluateSecurity();
         verify(auditLogService).extractRemoteIp(eq(request));
-        verify(auditLogService).log(anyString(), anyString(), anyString());
+        verify(auditLogService).log(any(), any(), anyString());
 
         Staff staff = staffArgumentCaptor.getValue();
 
@@ -240,7 +238,7 @@ public class StaffResourceTest {
         verify(staffRepository).save(eq(staff));
         verify(staffLoader).evaluateSecurity();
         verify(auditLogService).extractRemoteIp(eq(request));
-        verify(auditLogService).log(anyString(), anyString(), anyString());
+        verify(auditLogService).log(any(), any(), anyString());
     }
 
     @Test
@@ -274,7 +272,7 @@ public class StaffResourceTest {
         verify(staffRepository).save(eq(staff));
         verify(staffLoader).evaluateSecurity();
         verify(auditLogService).extractRemoteIp(eq(request));
-        verify(auditLogService).log(anyString(), anyString(), anyString());
+        verify(auditLogService).log(any(), any(), anyString());
     }
 
     @Test(expected = InsufficientPermissionException.class)
@@ -397,7 +395,7 @@ public class StaffResourceTest {
         verify(staffRepository).delete(eq(staff));
         verify(staffLoader).evaluateSecurity();
         verify(auditLogService).extractRemoteIp(eq(request));
-        verify(auditLogService).log(anyString(), anyString(), anyString());
+        verify(auditLogService).log(any(), any(), anyString());
     }
 
     @Test(expected = InsufficientPermissionException.class)

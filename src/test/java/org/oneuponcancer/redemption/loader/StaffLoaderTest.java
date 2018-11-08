@@ -33,9 +33,9 @@ public class StaffLoaderTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        when(bCryptPasswordEncoder.encode(anyString())).thenAnswer(invocation -> invocation.getArgumentAt(0, String.class));
+        when(bCryptPasswordEncoder.encode(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
         when(bCryptPasswordEncoder.matches(anyString(), anyString())).thenAnswer(
-                invocation -> invocation.getArgumentAt(0, String.class).equals(invocation.getArgumentAt(1, String.class)));
+                invocation -> invocation.getArgument(0).equals(invocation.getArgument(1)));
 
         staffLoader = new StaffLoader(staffRepository, bCryptPasswordEncoder);
     }

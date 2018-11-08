@@ -30,8 +30,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
 public class EventResourceTest {
@@ -69,7 +67,7 @@ public class EventResourceTest {
 
         when(eventRepository.findAll()).thenReturn(allEvents);
         when(eventRepository.save(any(Event.class))).thenAnswer(i -> {
-            Event event = i.getArgumentAt(0, Event.class);
+            Event event = i.getArgument(0);
 
             event.setId(UUID.randomUUID());
 
@@ -115,7 +113,7 @@ public class EventResourceTest {
         assertNotNull(response);
         verify(eventRepository).save(eventArgumentCaptor.capture());
         verify(auditLogService).extractRemoteIp(eq(request));
-        verify(auditLogService).log(anyString(), anyString(), anyString());
+        verify(auditLogService).log(any(), any(), anyString());
 
         Event event = eventArgumentCaptor.getValue();
 
@@ -255,7 +253,7 @@ public class EventResourceTest {
         verify(event).setDescription(eq("A big bag of foop."));
         verify(eventRepository).save(eq(event));
         verify(auditLogService).extractRemoteIp(eq(request));
-        verify(auditLogService).log(anyString(), anyString(), anyString());
+        verify(auditLogService).log(any(), any(), anyString());
     }
 
     @Test(expected = InsufficientPermissionException.class)
@@ -421,7 +419,7 @@ public class EventResourceTest {
         verify(eventRepository).findById(eq(uuid));
         verify(eventRepository).delete(eq(event));
         verify(auditLogService).extractRemoteIp(eq(request));
-        verify(auditLogService).log(anyString(), anyString(), anyString());
+        verify(auditLogService).log(any(), any(), anyString());
     }
 
     @Test(expected = InsufficientPermissionException.class)

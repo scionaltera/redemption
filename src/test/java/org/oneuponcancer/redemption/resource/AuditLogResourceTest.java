@@ -32,11 +32,11 @@ public class AuditLogResourceTest {
     private AuditLogResource auditLogResource;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
 
         when(auditLogRepository.findAll(any(PageRequest.class))).thenAnswer(invocation -> {
-            PageRequest request = invocation.getArgumentAt(0, PageRequest.class);
+            PageRequest request = invocation.getArgument(0);
             List<AuditLog> items = new ArrayList<>();
 
             for (int i = 0; i < request.getPageSize(); i++) {
@@ -59,38 +59,38 @@ public class AuditLogResourceTest {
     }
 
     @Test
-    public void testFetch() throws Exception {
+    public void testFetch() {
         List<AuditLog> results = auditLogResource.fetchAuditLogs(principal, null);
 
         assertEquals(REQUEST_MAX, results.size());
     }
 
     @Test(expected = InsufficientPermissionException.class)
-    public void testFetchNotAllowed() throws Exception {
+    public void testFetchNotAllowed() {
         when(principal.getAuthorities()).thenReturn(Collections.emptyList());
 
         auditLogResource.fetchAuditLogs(principal, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testFetchZero() throws Exception {
+    public void testFetchZero() {
         auditLogResource.fetchAuditLogs(principal, 0);
     }
 
     @Test
-    public void testFetchOne() throws Exception {
+    public void testFetchOne() {
         List<AuditLog> results = auditLogResource.fetchAuditLogs(principal, 1);
 
         assertEquals(1, results.size());
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testFetchTooMany() throws Exception {
+    public void testFetchTooMany() {
         auditLogResource.fetchAuditLogs(principal, REQUEST_MAX + 1);
     }
 
     @Test
-    public void testFetchMax() throws Exception {
+    public void testFetchMax() {
         List<AuditLog> results = auditLogResource.fetchAuditLogs(principal, REQUEST_MAX);
 
         assertEquals(REQUEST_MAX, results.size());
