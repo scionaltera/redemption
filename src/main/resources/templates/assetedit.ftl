@@ -27,6 +27,18 @@
                         <label for="">Description</label>
                         <input type="text" class="form-control" name="description" id="asset-description" placeholder="Description" value="${asset.description}">
                     </div>
+                    <div class="form-group">
+                        <label for="">Event</label>
+                        <select name="eventId" id="asset-event">
+                            <#list events as event>
+                                <#if event.id == asset.event.id>
+                                    <option value="${event.id}" selected>${event.name}</option>
+                                <#else>
+                                    <option value="${event.id}">${event.name}</option>
+                                </#if>
+                            </#list>
+                        </select>
+                    </div>
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                     <button class="btn btn-danger">Cancel</button>
                     <button class="btn btn-primary">Submit</button>

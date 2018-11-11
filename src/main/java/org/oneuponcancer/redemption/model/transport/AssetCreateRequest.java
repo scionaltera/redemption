@@ -1,6 +1,8 @@
 package org.oneuponcancer.redemption.model.transport;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.UUID;
 
 public class AssetCreateRequest {
     @Size(min = 3, message = "Names must be at least 3 letters long.")
@@ -8,6 +10,9 @@ public class AssetCreateRequest {
 
     @Size(min = 3, message = "Descriptions must be at least 3 letters long.")
     private String description;
+
+    @NotNull(message = "Event must be selected.")
+    private UUID eventId;
 
     public String getName() {
         return name;
@@ -23,5 +28,13 @@ public class AssetCreateRequest {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public UUID getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(UUID eventId) {
+        this.eventId = eventId;
     }
 }

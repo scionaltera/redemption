@@ -8,10 +8,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.oneuponcancer.redemption.exception.InsufficientPermissionException;
 import org.oneuponcancer.redemption.model.Asset;
+import org.oneuponcancer.redemption.model.Event;
 import org.oneuponcancer.redemption.model.Permission;
 import org.oneuponcancer.redemption.model.transport.AssetCreateRequest;
 import org.oneuponcancer.redemption.model.transport.AssetEditRequest;
 import org.oneuponcancer.redemption.repository.AssetRepository;
+import org.oneuponcancer.redemption.repository.EventRepository;
 import org.oneuponcancer.redemption.service.AuditLogService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -37,6 +39,9 @@ public class AssetResourceTest {
     private AssetRepository assetRepository;
 
     @Mock
+    private EventRepository eventRepository;
+
+    @Mock
     private AuditLogService auditLogService;
 
     @Mock
@@ -49,6 +54,7 @@ public class AssetResourceTest {
     private HttpServletRequest request;
 
     private List<Asset> allAssets = new ArrayList<>();
+    private List<Event> allEvents = new ArrayList<>();
 
     private AssetResource assetResource;
 
@@ -60,6 +66,16 @@ public class AssetResourceTest {
             allAssets.add(mock(Asset.class));
         }
 
+        for (int i = 0; i < 3; i++) {
+            Event event = new Event();
+
+            event.setId(UUID.randomUUID());
+            event.setName("Event " + i);
+
+            when(eventRepository.findById(eq(event.getId()))).thenReturn(Optional.of(event));
+            allEvents.add(event);
+        }
+
         when(assetRepository.findAll()).thenReturn(allAssets);
         when(assetRepository.save(any(Asset.class))).thenAnswer(i -> {
             Asset asset = i.getArgument(0);
@@ -68,9 +84,11 @@ public class AssetResourceTest {
 
             return asset;
         });
+        when(eventRepository.findAll()).thenReturn(allEvents);
 
         assetResource = new AssetResource(
                 assetRepository,
+                eventRepository,
                 auditLogService);
     }
 
@@ -95,6 +113,7 @@ public class AssetResourceTest {
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.CREATE_ASSET.name())));
         when(createRequest.getName()).thenReturn("Foop");
         when(createRequest.getDescription()).thenReturn("A big bag of foop.");
+        when(createRequest.getEventId()).thenReturn(allEvents.get(0).getId());
 
         Asset response = assetResource.createAsset(
                 createRequest,
@@ -112,6 +131,7 @@ public class AssetResourceTest {
 
         assertEquals("Foop", asset.getName());
         assertEquals("A big bag of foop.", asset.getDescription());
+        assertEquals(allEvents.get(0), asset.getEvent());
         assertNotNull(asset.getId());
     }
 
@@ -170,6 +190,28 @@ public class AssetResourceTest {
         );
     }
 
+    @Test(expected = ValidationException.class)
+    public void testCreateAssetMissingEvent() {
+        AssetCreateRequest createRequest = new AssetCreateRequest();
+        ObjectError objectError = mock(ObjectError.class);
+
+        when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.CREATE_ASSET.name())));
+        when(objectError.getDefaultMessage()).thenReturn("Missing event.");
+        when(bindingResult.hasErrors()).thenReturn(true);
+        when(bindingResult.getAllErrors()).thenReturn(Collections.singletonList(objectError));
+
+        createRequest.setName("Foop");
+        createRequest.setDescription("A big bag of foop.");
+        createRequest.setEventId(null);
+
+        assetResource.createAsset(
+                createRequest,
+                bindingResult,
+                principal,
+                request
+        );
+    }
+
     @Test
     public void testUpdateAsset() {
         UUID uuid = UUID.randomUUID();
@@ -180,6 +222,7 @@ public class AssetResourceTest {
         when(assetRepository.findById(eq(uuid))).thenReturn(Optional.of(asset));
         when(editRequest.getName()).thenReturn("Foop");
         when(editRequest.getDescription()).thenReturn("A big bag of foop.");
+        when(editRequest.getEventId()).thenReturn(allEvents.get(0).getId());
 
         Asset response = assetResource.updateAsset(
                 uuid.toString(),
@@ -192,6 +235,7 @@ public class AssetResourceTest {
         assertNotNull(response);
         verify(asset).setName(eq("Foop"));
         verify(asset).setDescription(eq("A big bag of foop."));
+        verify(asset).setEvent(eq(allEvents.get(0)));
         verify(assetRepository).save(eq(asset));
         verify(auditLogService).extractRemoteIp(eq(request));
         verify(auditLogService).log(any(), any(), anyString());
@@ -272,6 +316,32 @@ public class AssetResourceTest {
         when(assetRepository.findById(eq(uuid))).thenReturn(Optional.of(asset));
         when(editRequest.getName()).thenReturn("Carp");
         when(editRequest.getDescription()).thenReturn("");
+
+        assetResource.updateAsset(
+                uuid.toString(),
+                editRequest,
+                bindingResult,
+                principal,
+                request
+        );
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testUpdateAssetMissingEvent() {
+        UUID uuid = UUID.randomUUID();
+        AssetEditRequest editRequest = new AssetEditRequest();
+        Asset asset = mock(Asset.class);
+        ObjectError objectError = mock(ObjectError.class);
+
+        when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.EDIT_ASSET.name())));
+        when(objectError.getDefaultMessage()).thenReturn("Invalid description.");
+        when(bindingResult.hasErrors()).thenReturn(true);
+        when(bindingResult.getAllErrors()).thenReturn(Collections.singletonList(objectError));
+        when(assetRepository.findById(eq(uuid))).thenReturn(Optional.of(asset));
+
+        editRequest.setName("Carp");
+        editRequest.setDescription("A bucket of carp.");
+        editRequest.setEventId(null);
 
         assetResource.updateAsset(
                 uuid.toString(),

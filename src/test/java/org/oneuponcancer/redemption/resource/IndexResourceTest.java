@@ -342,6 +342,7 @@ public class IndexResourceTest {
 
         verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
         verify(model).addAttribute(eq("permissions"), any(Permission[].class));
+        verify(model).addAttribute(eq("events"), anyCollection());
     }
 
     @Test(expected = InsufficientPermissionException.class)
@@ -364,6 +365,7 @@ public class IndexResourceTest {
 
         verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
         verify(model).addAttribute(eq("permissions"), any(Permission[].class));
+        verify(model).addAttribute(eq("events"), anyCollection());
         verify(model).addAttribute(eq("asset"), any(Asset.class));
     }
 
