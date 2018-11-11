@@ -50,7 +50,7 @@
             <div id="asset-box-inner" class="box-inner">
                 <p>Assets <button id="asset-button-create" class="btn btn-success" <#if create\-asset??><#else>disabled</#if>>Create</button></p>
                 <table id="asset-box-content" class="table">
-                    <tr><th>Name</th><th>Actions</th></tr>
+                    <tr><th>Name</th><th>Event</th><th>Actions</th></tr>
                 </table>
             </div>
         </div>
