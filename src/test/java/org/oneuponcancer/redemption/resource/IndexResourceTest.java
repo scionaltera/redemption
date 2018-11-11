@@ -26,6 +26,7 @@ import java.util.UUID;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
+import static org.oneuponcancer.redemption.TestUtility.generateParticipants;
 
 public class IndexResourceTest {
     private static final String APPLICATION_VERSION = "0.0.0";
@@ -387,6 +388,7 @@ public class IndexResourceTest {
 
     @Test
     public void testCreateEvent() {
+        when(participantRepository.findAll()).thenReturn(generateParticipants());
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(
                 new SimpleGrantedAuthority(Permission.CREATE_EVENT.name())
         ));
@@ -395,8 +397,11 @@ public class IndexResourceTest {
 
         assertEquals("eventcreate", result);
 
+        verify(participantRepository).findAll();
+
         verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
         verify(model).addAttribute(eq("permissions"), any(Permission[].class));
+        verify(model).addAttribute(eq("participants"), anyIterable());
     }
 
     @Test(expected = InsufficientPermissionException.class)
@@ -409,6 +414,7 @@ public class IndexResourceTest {
         UUID uuid = UUID.randomUUID();
 
         when(eventRepository.findById(eq(uuid))).thenReturn(Optional.of(event));
+        when(participantRepository.findAll()).thenReturn(generateParticipants());
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(
                 new SimpleGrantedAuthority(Permission.EDIT_EVENT.name())
         ));
@@ -417,9 +423,12 @@ public class IndexResourceTest {
 
         assertEquals("eventedit", result);
 
+        verify(participantRepository).findAll();
+
         verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
         verify(model).addAttribute(eq("permissions"), any(Permission[].class));
         verify(model).addAttribute(eq("event"), any(Event.class));
+        verify(model).addAttribute(eq("participants"), anyIterable());
     }
 
     @Test(expected = InsufficientPermissionException.class)

@@ -4,7 +4,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 
@@ -48,5 +51,14 @@ public class EventCreateRequestTest {
         eventCreateRequest.setEndDate(now);
 
         assertEquals(now, eventCreateRequest.getEndDate());
+    }
+
+    @Test
+    public void testParticipants() {
+        List<UUID> participants = new ArrayList<>();
+
+        eventCreateRequest.setParticipants(participants);
+
+        assertEquals(participants, eventCreateRequest.getParticipants());
     }
 }

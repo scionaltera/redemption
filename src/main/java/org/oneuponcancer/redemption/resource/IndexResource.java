@@ -12,8 +12,6 @@ import org.oneuponcancer.redemption.repository.AssetRepository;
 import org.oneuponcancer.redemption.repository.EventRepository;
 import org.oneuponcancer.redemption.repository.ParticipantRepository;
 import org.oneuponcancer.redemption.repository.StaffRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Controller;
@@ -34,8 +32,6 @@ import java.util.UUID;
 
 @Controller
 public class IndexResource {
-    private static final Logger LOGGER = LoggerFactory.getLogger(IndexResource.class);
-
     private String applicationVersion;
     private StaffLoader staffLoader;
     private StaffRepository staffRepository;
@@ -186,8 +182,11 @@ public class IndexResource {
             throw new InsufficientPermissionException("Not allowed to create events.");
         }
 
+        List<Participant> participants = participantRepository.findAll();
+
         model.addAttribute("version", applicationVersion);
         model.addAttribute("permissions", Permission.values());
+        model.addAttribute("participants", participants);
 
         return "eventcreate";
     }
@@ -203,9 +202,12 @@ public class IndexResource {
                 .findById(uuid)
                 .orElseThrow(() -> new IllegalArgumentException("No event with provided ID"));
 
+        List<Participant> participants = participantRepository.findAll();
+
         model.addAttribute("version", applicationVersion);
         model.addAttribute("permissions", Permission.values());
         model.addAttribute("event", event);
+        model.addAttribute("participants", participants);
 
         return "eventedit";
     }
