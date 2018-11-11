@@ -35,6 +35,14 @@
                         <label for="">End Date (GMT)</label>
                         <input type="datetime-local" class="form-control" name="endDate" id="event-end-date">
                     </div>
+                    <div class="form-group">
+                        <label for="">Participants</label>
+                        <select multiple="multiple" name="participants" id="event-participants">
+                            <#list participants as participant>
+                                <option value="${participant.id}">${participant.lastName}, ${participant.firstName}</option>
+                            </#list>
+                        </select>
+                    </div>
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                     <button class="btn btn-danger">Cancel</button>
                     <button class="btn btn-primary">Submit</button>
