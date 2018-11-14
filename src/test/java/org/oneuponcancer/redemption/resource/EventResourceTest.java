@@ -140,6 +140,43 @@ public class EventResourceTest {
         assertEquals(participants, event.getParticipants());
     }
 
+    @Test
+    public void testCreateEventNoParticipants() {
+        EventCreateRequest createRequest = new EventCreateRequest();
+
+        createRequest.setName("Foop");
+        createRequest.setDescription("A big bag of foop.");
+        createRequest.setStartDate(tomorrow);
+        createRequest.setEndDate(nextWeek);
+        createRequest.setParticipants(null);
+
+        when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.CREATE_EVENT.name())));
+
+        when(participantRepository.findAllById(eq(participantIds))).thenReturn(participants);
+        when(participantRepository.findAllById(isNull())).thenReturn(null);
+
+        Event response = eventResource.createEvent(
+                createRequest,
+                bindingResult,
+                principal,
+                request
+        );
+
+        assertNotNull(response);
+        verify(eventRepository).save(eventArgumentCaptor.capture());
+        verify(auditLogService).extractRemoteIp(eq(request));
+        verify(auditLogService).log(any(), any(), anyString());
+
+        Event event = eventArgumentCaptor.getValue();
+
+        assertNotNull(event.getId());
+        assertEquals("Foop", event.getName());
+        assertEquals("A big bag of foop.", event.getDescription());
+        assertEquals(tomorrow, event.getStartDate());
+        assertEquals(nextWeek, event.getEndDate());
+        assertEquals(Collections.emptyList(), event.getParticipants());
+    }
+
     @Test(expected = InsufficientPermissionException.class)
     public void testCreateEventNoPermission() {
         EventCreateRequest createRequest = mock(EventCreateRequest.class);
@@ -273,6 +310,43 @@ public class EventResourceTest {
         assertEquals(tomorrow, event.getStartDate());
         assertEquals(nextWeek, event.getEndDate());
         assertEquals(participants, event.getParticipants());
+
+        verify(eventRepository).save(eq(event));
+        verify(auditLogService).extractRemoteIp(eq(request));
+        verify(auditLogService).log(any(), any(), anyString());
+    }
+
+    @Test
+    public void testUpdateEventNoParticipants() {
+        UUID uuid = UUID.randomUUID();
+        EventEditRequest editRequest = new EventEditRequest();
+        Event event = new Event();
+
+        when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.EDIT_EVENT.name())));
+        when(eventRepository.findById(eq(uuid))).thenReturn(Optional.of(event));
+        when(participantRepository.findAllById(eq(participantIds))).thenReturn(participants);
+        when(participantRepository.findAllById(isNull())).thenReturn(null);
+
+        editRequest.setName("Foop");
+        editRequest.setDescription("A big bag of foop.");
+        editRequest.setStartDate(tomorrow);
+        editRequest.setEndDate(nextWeek);
+        editRequest.setParticipants(null);
+
+        Event response = eventResource.updateEvent(
+                uuid.toString(),
+                editRequest,
+                bindingResult,
+                principal,
+                request
+        );
+
+        assertNotNull(response);
+        assertEquals("Foop", event.getName());
+        assertEquals("A big bag of foop.", event.getDescription());
+        assertEquals(tomorrow, event.getStartDate());
+        assertEquals(nextWeek, event.getEndDate());
+        assertEquals(Collections.emptyList(), event.getParticipants());
 
         verify(eventRepository).save(eq(event));
         verify(auditLogService).extractRemoteIp(eq(request));

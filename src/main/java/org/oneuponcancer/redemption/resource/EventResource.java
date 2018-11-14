@@ -27,6 +27,7 @@ import javax.validation.Valid;
 import javax.validation.ValidationException;
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -78,9 +79,13 @@ public class EventResource {
         event.setStartDate(eventCreateRequest.getStartDate());
         event.setEndDate(eventCreateRequest.getEndDate());
 
-        List<Participant> participants = participantRepository.findAllById(eventCreateRequest.getParticipants());
+        if (eventCreateRequest.getParticipants() != null) {
+            List<Participant> participants = participantRepository.findAllById(eventCreateRequest.getParticipants());
 
-        event.setParticipants(participants);
+            event.setParticipants(participants);
+        } else {
+            event.setParticipants(Collections.emptyList());
+        }
 
         Event savedEvent = eventRepository.save(event);
 
@@ -120,9 +125,13 @@ public class EventResource {
         event.setStartDate(eventEditRequest.getStartDate());
         event.setEndDate(eventEditRequest.getEndDate());
 
-        List<Participant> participants = participantRepository.findAllById(eventEditRequest.getParticipants());
+        if (eventEditRequest.getParticipants() != null) {
+            List<Participant> participants = participantRepository.findAllById(eventEditRequest.getParticipants());
 
-        event.setParticipants(participants);
+            event.setParticipants(participants);
+        } else {
+            event.setParticipants(Collections.emptyList());
+        }
 
         Event savedEvent = eventRepository.save(event);
 

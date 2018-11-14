@@ -1,5 +1,6 @@
 package org.oneuponcancer.redemption.model.transport;
 
+import org.oneuponcancer.redemption.model.constraint.DateRange;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.FutureOrPresent;
@@ -8,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+@DateRange(startDate = "startDate", endDate = "endDate")
 public class EventCreateRequest {
     @Size(min = 3, message = "Names must be at least 3 letters long.")
     private String name;
