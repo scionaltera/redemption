@@ -2,12 +2,10 @@ package org.oneuponcancer.redemption.resource;
 
 import org.oneuponcancer.redemption.exception.InsufficientPermissionException;
 import org.oneuponcancer.redemption.model.Event;
-import org.oneuponcancer.redemption.model.Participant;
 import org.oneuponcancer.redemption.model.Permission;
 import org.oneuponcancer.redemption.model.transport.EventCreateRequest;
 import org.oneuponcancer.redemption.model.transport.EventEditRequest;
 import org.oneuponcancer.redemption.repository.EventRepository;
-import org.oneuponcancer.redemption.repository.ParticipantRepository;
 import org.oneuponcancer.redemption.service.AuditLogService;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
@@ -36,13 +34,11 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/event")
 public class EventResource {
     private EventRepository eventRepository;
-    private ParticipantRepository participantRepository;
     private AuditLogService auditLogService;
 
     @Inject
-    public EventResource(EventRepository eventRepository, ParticipantRepository participantRepository, AuditLogService auditLogService) {
+    public EventResource(EventRepository eventRepository, AuditLogService auditLogService) {
         this.eventRepository = eventRepository;
-        this.participantRepository = participantRepository;
         this.auditLogService = auditLogService;
     }
 
@@ -78,14 +74,7 @@ public class EventResource {
         event.setDescription(eventCreateRequest.getDescription());
         event.setStartDate(eventCreateRequest.getStartDate());
         event.setEndDate(eventCreateRequest.getEndDate());
-
-        if (eventCreateRequest.getParticipants() != null) {
-            List<Participant> participants = participantRepository.findAllById(eventCreateRequest.getParticipants());
-
-            event.setParticipants(participants);
-        } else {
-            event.setParticipants(Collections.emptyList());
-        }
+        event.setParticipants(Collections.emptyList());
 
         Event savedEvent = eventRepository.save(event);
 
@@ -124,14 +113,6 @@ public class EventResource {
         event.setDescription(eventEditRequest.getDescription());
         event.setStartDate(eventEditRequest.getStartDate());
         event.setEndDate(eventEditRequest.getEndDate());
-
-        if (eventEditRequest.getParticipants() != null) {
-            List<Participant> participants = participantRepository.findAllById(eventEditRequest.getParticipants());
-
-            event.setParticipants(participants);
-        } else {
-            event.setParticipants(Collections.emptyList());
-        }
 
         Event savedEvent = eventRepository.save(event);
 

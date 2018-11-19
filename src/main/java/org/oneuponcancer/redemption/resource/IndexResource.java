@@ -182,11 +182,8 @@ public class IndexResource {
             throw new InsufficientPermissionException("Not allowed to create events.");
         }
 
-        List<Participant> participants = participantRepository.findAll();
-
         model.addAttribute("version", applicationVersion);
         model.addAttribute("permissions", Permission.values());
-        model.addAttribute("participants", participants);
 
         return "eventcreate";
     }
@@ -202,12 +199,10 @@ public class IndexResource {
                 .findById(uuid)
                 .orElseThrow(() -> new IllegalArgumentException("No event with provided ID"));
 
-        List<Participant> participants = participantRepository.findAll();
-
         model.addAttribute("version", applicationVersion);
         model.addAttribute("permissions", Permission.values());
         model.addAttribute("event", event);
-        model.addAttribute("participants", participants);
+        model.addAttribute("participants", event.getParticipants());
 
         return "eventedit";
     }

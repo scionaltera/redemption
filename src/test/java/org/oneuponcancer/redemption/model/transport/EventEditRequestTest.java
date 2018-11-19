@@ -52,13 +52,4 @@ public class EventEditRequestTest {
 
         assertEquals(now, eventEditRequest.getEndDate());
     }
-
-    @Test
-    public void testParticipants() {
-        List<UUID> participants = new ArrayList<>();
-
-        eventEditRequest.setParticipants(participants);
-
-        assertEquals(participants, eventEditRequest.getParticipants());
-    }
 }

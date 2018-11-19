@@ -397,11 +397,8 @@ public class IndexResourceTest {
 
         assertEquals("eventcreate", result);
 
-        verify(participantRepository).findAll();
-
         verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
         verify(model).addAttribute(eq("permissions"), any(Permission[].class));
-        verify(model).addAttribute(eq("participants"), anyIterable());
     }
 
     @Test(expected = InsufficientPermissionException.class)
@@ -414,7 +411,6 @@ public class IndexResourceTest {
         UUID uuid = UUID.randomUUID();
 
         when(eventRepository.findById(eq(uuid))).thenReturn(Optional.of(event));
-        when(participantRepository.findAll()).thenReturn(generateParticipants());
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(
                 new SimpleGrantedAuthority(Permission.EDIT_EVENT.name())
         ));
@@ -422,8 +418,6 @@ public class IndexResourceTest {
         String result = indexResource.editEvent(principal, model, uuid.toString());
 
         assertEquals("eventedit", result);
-
-        verify(participantRepository).findAll();
 
         verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
         verify(model).addAttribute(eq("permissions"), any(Permission[].class));

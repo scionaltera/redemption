@@ -6,8 +6,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.Size;
 import java.util.Date;
-import java.util.List;
-import java.util.UUID;
 
 @DateRange(startDate = "startDate", endDate = "endDate")
 public class EventEditRequest {
@@ -24,8 +22,6 @@ public class EventEditRequest {
     @FutureOrPresent(message = "End date must be in the future.")
     @DateTimeFormat(pattern="yyyy-MM-dd'T'HH:mm")
     private Date endDate;
-
-    private List<UUID> participants;
 
     public String getName() {
         return name;
@@ -57,13 +53,5 @@ public class EventEditRequest {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
-    }
-
-    public List<UUID> getParticipants() {
-        return participants;
-    }
-
-    public void setParticipants(List<UUID> participants) {
-        this.participants = participants;
     }
 }
