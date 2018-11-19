@@ -1,0 +1,1 @@
+ALTER TABLE participant ADD CONSTRAINT UNIQUE (email);

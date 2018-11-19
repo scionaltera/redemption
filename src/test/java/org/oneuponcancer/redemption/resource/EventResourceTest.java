@@ -8,12 +8,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.oneuponcancer.redemption.exception.InsufficientPermissionException;
 import org.oneuponcancer.redemption.model.Event;
-import org.oneuponcancer.redemption.model.Participant;
 import org.oneuponcancer.redemption.model.Permission;
 import org.oneuponcancer.redemption.model.transport.EventCreateRequest;
 import org.oneuponcancer.redemption.model.transport.EventEditRequest;
 import org.oneuponcancer.redemption.repository.EventRepository;
-import org.oneuponcancer.redemption.repository.ParticipantRepository;
 import org.oneuponcancer.redemption.service.AuditLogService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -33,8 +31,6 @@ import java.util.UUID;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
-import static org.oneuponcancer.redemption.TestUtility.generateParticipantUUIDs;
-import static org.oneuponcancer.redemption.TestUtility.generateParticipants;
 
 public class EventResourceTest {
     @Captor
@@ -42,9 +38,6 @@ public class EventResourceTest {
 
     @Mock
     private EventRepository eventRepository;
-
-    @Mock
-    private ParticipantRepository participantRepository;
 
     @Mock
     private AuditLogService auditLogService;
@@ -61,9 +54,6 @@ public class EventResourceTest {
     private Date tomorrow = Date.from(Instant.now().plus(1, ChronoUnit.DAYS));
     private Date nextWeek = Date.from(Instant.now().plus(7, ChronoUnit.DAYS));
     private List<Event> allEvents = new ArrayList<>();
-
-    private List<Participant> participants = generateParticipants();
-    private List<UUID> participantIds = generateParticipantUUIDs(participants);
 
     private EventResource eventResource;
 
@@ -86,7 +76,6 @@ public class EventResourceTest {
 
         eventResource = new EventResource(
                 eventRepository,
-                participantRepository,
                 auditLogService);
     }
 
@@ -112,48 +101,8 @@ public class EventResourceTest {
         createRequest.setDescription("A big bag of foop.");
         createRequest.setStartDate(tomorrow);
         createRequest.setEndDate(nextWeek);
-        createRequest.setParticipants(participantIds);
 
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.CREATE_EVENT.name())));
-
-        when(participantRepository.findAllById(eq(participantIds))).thenReturn(participants);
-
-        Event response = eventResource.createEvent(
-                createRequest,
-                bindingResult,
-                principal,
-                request
-        );
-
-        assertNotNull(response);
-        verify(eventRepository).save(eventArgumentCaptor.capture());
-        verify(auditLogService).extractRemoteIp(eq(request));
-        verify(auditLogService).log(any(), any(), anyString());
-
-        Event event = eventArgumentCaptor.getValue();
-
-        assertNotNull(event.getId());
-        assertEquals("Foop", event.getName());
-        assertEquals("A big bag of foop.", event.getDescription());
-        assertEquals(tomorrow, event.getStartDate());
-        assertEquals(nextWeek, event.getEndDate());
-        assertEquals(participants, event.getParticipants());
-    }
-
-    @Test
-    public void testCreateEventNoParticipants() {
-        EventCreateRequest createRequest = new EventCreateRequest();
-
-        createRequest.setName("Foop");
-        createRequest.setDescription("A big bag of foop.");
-        createRequest.setStartDate(tomorrow);
-        createRequest.setEndDate(nextWeek);
-        createRequest.setParticipants(null);
-
-        when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.CREATE_EVENT.name())));
-
-        when(participantRepository.findAllById(eq(participantIds))).thenReturn(participants);
-        when(participantRepository.findAllById(isNull())).thenReturn(null);
 
         Event response = eventResource.createEvent(
                 createRequest,
@@ -286,15 +235,15 @@ public class EventResourceTest {
         EventEditRequest editRequest = new EventEditRequest();
         Event event = new Event();
 
+        event.setParticipants(Collections.emptyList());
+
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.EDIT_EVENT.name())));
         when(eventRepository.findById(eq(uuid))).thenReturn(Optional.of(event));
-        when(participantRepository.findAllById(eq(participantIds))).thenReturn(participants);
 
         editRequest.setName("Foop");
         editRequest.setDescription("A big bag of foop.");
         editRequest.setStartDate(tomorrow);
         editRequest.setEndDate(nextWeek);
-        editRequest.setParticipants(participantIds);
 
         Event response = eventResource.updateEvent(
                 uuid.toString(),
@@ -309,44 +258,7 @@ public class EventResourceTest {
         assertEquals("A big bag of foop.", event.getDescription());
         assertEquals(tomorrow, event.getStartDate());
         assertEquals(nextWeek, event.getEndDate());
-        assertEquals(participants, event.getParticipants());
-
-        verify(eventRepository).save(eq(event));
-        verify(auditLogService).extractRemoteIp(eq(request));
-        verify(auditLogService).log(any(), any(), anyString());
-    }
-
-    @Test
-    public void testUpdateEventNoParticipants() {
-        UUID uuid = UUID.randomUUID();
-        EventEditRequest editRequest = new EventEditRequest();
-        Event event = new Event();
-
-        when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.EDIT_EVENT.name())));
-        when(eventRepository.findById(eq(uuid))).thenReturn(Optional.of(event));
-        when(participantRepository.findAllById(eq(participantIds))).thenReturn(participants);
-        when(participantRepository.findAllById(isNull())).thenReturn(null);
-
-        editRequest.setName("Foop");
-        editRequest.setDescription("A big bag of foop.");
-        editRequest.setStartDate(tomorrow);
-        editRequest.setEndDate(nextWeek);
-        editRequest.setParticipants(null);
-
-        Event response = eventResource.updateEvent(
-                uuid.toString(),
-                editRequest,
-                bindingResult,
-                principal,
-                request
-        );
-
-        assertNotNull(response);
-        assertEquals("Foop", event.getName());
-        assertEquals("A big bag of foop.", event.getDescription());
-        assertEquals(tomorrow, event.getStartDate());
-        assertEquals(nextWeek, event.getEndDate());
-        assertEquals(Collections.emptyList(), event.getParticipants());
+        assertNotNull(event.getParticipants());
 
         verify(eventRepository).save(eq(event));
         verify(auditLogService).extractRemoteIp(eq(request));
