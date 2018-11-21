@@ -55,7 +55,7 @@
                         <table id="event-participant-table">
                             <tr><th>Participant</th><th>Actions</th></tr>
                             <#list participants as participant>
-                                <tr><td>${participant.lastName}, ${participant.firstName} (${participant.email})</td><td><button type="submit" class="btn btn-danger" disabled>Remove</button></td></tr>
+                                <tr><td>${participant.lastName}, ${participant.firstName} (${participant.email})</td><td><button data-csrf-param="${_csrf.parameterName}" data-csrf-token="${_csrf.token}" data-participant-id="${participant.id}" type="submit" class="btn btn-danger">Remove</button></td></tr>
                             </#list>
                         </table>
                     </div>

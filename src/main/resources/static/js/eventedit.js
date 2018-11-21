@@ -39,8 +39,10 @@ $(document).ready(function() {
 
             if (matches.length > 0) {
                 var participant = matches[0];
+                var csrfToken = $("meta[name='_csrf']").attr("content");
 
-                $("#event-participant-table tr:last").after(`<tr><td>${participant.lastName}, ${participant.firstName} (${participant.email})</td><td><button type="submit" class="btn btn-danger" disabled>Remove</button></td></tr>`);
+                var row = $("#event-participant-table tr:last").after(`<tr><td>${participant.lastName}, ${participant.firstName} (${participant.email})</td><td><button data-csrf-param="_csrf" data-csrf-token="${csrfToken}" data-participant-id="${participant.id}" type="submit" class="btn btn-danger">Remove</button></td></tr>`);
+                row.next().find("button").click(removeButtonClick);
             }
         }).fail(function(jqXHR) {
             var errorBox = $("#event-participant-error-box");
@@ -52,4 +54,30 @@ $(document).ready(function() {
         event.preventDefault();
         return false;
     });
+
+    $("#event-participants-edit-form button.btn-danger").click(removeButtonClick);
 });
+
+var removeButtonClick = function() {
+    var form = $("#event-participants-edit-form form");
+    var participantId = $(this)[0].dataset.participantId;
+    var payload = {};
+
+    payload[$(this)[0].dataset.csrfParam] = $(this)[0].dataset.csrfToken;
+
+    $.ajax({
+        url: form.attr("action") + "/" + participantId,
+        method: "DELETE",
+        data: payload
+    }).done(function() {
+        $("#event-participant-table tr").has("button[data-participant-id=" + participantId + "]").remove();
+    }).fail(function(jqXHR) {
+        var errorBox = $("#event-participant-error-box");
+
+        errorBox.removeClass("invisible");
+        errorBox.find("p").html(jqXHR.responseJSON.message.split("\n").join("<br/>"));
+    });
+
+    event.preventDefault();
+    return false;
+};

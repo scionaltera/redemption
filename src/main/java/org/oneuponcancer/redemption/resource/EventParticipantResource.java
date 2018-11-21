@@ -9,6 +9,7 @@ import org.oneuponcancer.redemption.repository.EventRepository;
 import org.oneuponcancer.redemption.repository.ParticipantRepository;
 import org.oneuponcancer.redemption.service.AuditLogService;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Controller;
@@ -93,6 +94,43 @@ public class EventParticipantResource {
         return savedEvent;
     }
 
+    @RequestMapping(value = "/{participantId}", method = RequestMethod.DELETE)
+    @ResponseBody
+    public Event removeParticipant(@PathVariable("id") UUID eventId,
+                                   @PathVariable("participantId") UUID participantId,
+                                   Principal principal,
+                                   HttpServletRequest httpServletRequest) {
+
+        if (((UsernamePasswordAuthenticationToken)principal).getAuthorities().stream().noneMatch(a -> a.getAuthority().equals(Permission.EDIT_EVENT.name()))) {
+            throw new InsufficientPermissionException("Not allowed to edit events.");
+        }
+
+        Event event = eventRepository
+                .findById(eventId)
+                .orElseThrow(() -> new NullPointerException("No such event found."));
+
+        Participant participant = event.getParticipants().stream()
+                .filter(p -> participantId.equals(p.getId()))
+                .findAny()
+                .orElseThrow(() -> new NullPointerException("No such participant found."));
+
+        event.getParticipants().remove(participant);
+
+        Event savedEvent = eventRepository.save(event);
+
+        auditLogService.log(
+                principal.getName(),
+                auditLogService.extractRemoteIp(httpServletRequest),
+                String.format("Removed participant from event: %s (%s) -> %s (%s)",
+                        participant.getLastName() + ", " + participant.getFirstName(),
+                        participant.getId(),
+                        event.getName(),
+                        event.getId()));
+
+
+        return savedEvent;
+    }
+
     @ExceptionHandler(NullPointerException.class)
     public void handleNotFoundException(NullPointerException ex, HttpServletResponse response) throws Exception {
         response.sendError(HttpStatus.NOT_FOUND.value(), ex.getMessage());
@@ -106,5 +144,10 @@ public class EventParticipantResource {
     @ExceptionHandler(ValidationException.class)
     public void handleValidationException(ValidationException ex, HttpServletResponse response) throws IOException {
         response.sendError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public void handleDataIntegrityViolationException(@SuppressWarnings("unused") DataIntegrityViolationException ex, HttpServletResponse response) throws IOException {
+        response.sendError(HttpStatus.BAD_REQUEST.value(), "Could not perform the requested operation due to a constraint in the database.");
     }
 }
