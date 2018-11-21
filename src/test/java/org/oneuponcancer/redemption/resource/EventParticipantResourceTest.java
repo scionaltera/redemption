@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -170,6 +171,62 @@ public class EventParticipantResourceTest {
                 request,
                 bindingResult,
                 badEventId,
+                principal,
+                httpServletRequest);
+    }
+
+    @Test
+    public void testRemoveParticipant() {
+        event.getParticipants().add(participant);
+
+        Event result = resource.removeParticipant(
+                eventId,
+                participant.getId(),
+                principal,
+                httpServletRequest);
+
+        verify(eventRepository).save(any(Event.class));
+        verify(auditLogService).log(anyString(), anyString(), contains("Removed participant"));
+
+        assertFalse(result.getParticipants().contains(participant));
+    }
+
+    @Test(expected = InsufficientPermissionException.class)
+    public void testRemoveParticipantNoPermission() {
+        event.getParticipants().add(participant);
+
+        when(principal.getAuthorities()).thenReturn(Collections.emptyList());
+
+        resource.removeParticipant(
+                eventId,
+                participant.getId(),
+                principal,
+                httpServletRequest);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testRemoveParticipantNoSuchEvent() {
+        resource.removeParticipant(
+                UUID.randomUUID(),
+                participant.getId(),
+                principal,
+                httpServletRequest);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testRemoveParticipantNoSuchParticipant() {
+        resource.removeParticipant(
+                eventId,
+                UUID.randomUUID(),
+                principal,
+                httpServletRequest);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testRemoveParticipantButParticipantIsAlreadyRemoved() {
+        resource.removeParticipant(
+                eventId,
+                participant.getId(),
                 principal,
                 httpServletRequest);
     }
