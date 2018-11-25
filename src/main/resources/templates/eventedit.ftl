@@ -53,9 +53,28 @@
                     <div class="form-group">
                         <label for="">Participants</label>
                         <table id="event-participant-table">
-                            <tr><th>Participant</th><th>Actions</th></tr>
-                            <#list participants as participant>
-                                <tr><td>${participant.lastName}, ${participant.firstName} (${participant.email})</td><td><button data-csrf-param="${_csrf.parameterName}" data-csrf-token="${_csrf.token}" data-participant-id="${participant.id}" type="submit" class="btn btn-danger">Remove</button></td></tr>
+                            <tr><th>Participant</th><th>Award</th><th>Actions</th></tr>
+                            <#list awards as award>
+                            <tr>
+                                <td>${award.awardIdentity.participant.lastName}, ${award.awardIdentity.participant.firstName} (${award.awardIdentity.participant.email})</td>
+                                <td>
+                                <select>
+                                    <#if award.asset??>
+                                        <option value="none">None</option>
+                                    <#else>
+                                        <option value="none" selected>None</option>
+                                    </#if>
+                                    <#list assets as asset>
+                                        <#if award.asset?? && award.asset.id == asset.id>
+                                        <option value="${asset.id}" selected>${asset.name}</option>
+                                        <#else>
+                                        <option value="${asset.id}">${asset.name}</option>
+                                        </#if>
+                                    </#list>
+                                </select>
+                                </td>
+                                <td><button data-csrf-param="${_csrf.parameterName}" data-csrf-token="${_csrf.token}" data-participant-id="${award.awardIdentity.participant.id}" type="submit" class="btn btn-danger">Remove</button></td>
+                            </tr>
                             </#list>
                         </table>
                     </div>
