@@ -5,10 +5,16 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.oneuponcancer.redemption.exception.InsufficientPermissionException;
+import org.oneuponcancer.redemption.model.Asset;
+import org.oneuponcancer.redemption.model.Award;
+import org.oneuponcancer.redemption.model.AwardIdentity;
 import org.oneuponcancer.redemption.model.Event;
 import org.oneuponcancer.redemption.model.Participant;
 import org.oneuponcancer.redemption.model.Permission;
+import org.oneuponcancer.redemption.model.transport.AwardAssetChangeRequest;
 import org.oneuponcancer.redemption.model.transport.EventAddParticipantRequest;
+import org.oneuponcancer.redemption.repository.AssetRepository;
+import org.oneuponcancer.redemption.repository.AwardRepository;
 import org.oneuponcancer.redemption.repository.EventRepository;
 import org.oneuponcancer.redemption.repository.ParticipantRepository;
 import org.oneuponcancer.redemption.service.AuditLogService;
@@ -24,8 +30,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -35,6 +40,12 @@ public class EventParticipantResourceTest {
 
     @Mock
     private ParticipantRepository participantRepository;
+
+    @Mock
+    private AssetRepository assetRepository;
+
+    @Mock
+    private AwardRepository awardRepository;
 
     @Mock
     private AuditLogService auditLogService;
@@ -51,7 +62,10 @@ public class EventParticipantResourceTest {
     private String participantEmail = "mark@twain.com";
     private Participant participant = new Participant();
     private UUID eventId = UUID.randomUUID();
+    private UUID assetId = UUID.randomUUID();
     private Event event = new Event();
+    private Asset asset = new Asset();
+    private Award award = new Award();
 
     private EventParticipantResource resource;
 
@@ -69,6 +83,8 @@ public class EventParticipantResourceTest {
             return event;
         });
 
+        when(awardRepository.save(any(Award.class))).thenAnswer(i -> i.getArgument(0));
+
         participant.setId(UUID.randomUUID());
         participant.setEmail(participantEmail);
         participant.setFirstName("Mark");
@@ -78,15 +94,30 @@ public class EventParticipantResourceTest {
         event.setName("Test Event");
         event.setParticipants(new ArrayList<>());
 
+        asset.setId(assetId);
+        asset.setName("Shiny");
+        asset.setEvent(event);
+
+        AwardIdentity awardIdentity = new AwardIdentity();
+
+        awardIdentity.setEvent(event);
+        awardIdentity.setParticipant(participant);
+
+        award.setAwardIdentity(awardIdentity);
+
         when(principal.getName()).thenReturn("Admin");
         when(auditLogService.extractRemoteIp(any(HttpServletRequest.class))).thenReturn("500.501.502.503");
         when(participantRepository.findByEmail(eq(participantEmail))).thenReturn(Optional.of(participant));
         when(eventRepository.findById(eq(event.getId()))).thenReturn(Optional.of(event));
+        when(assetRepository.findById(eq(asset.getId()))).thenReturn(Optional.of(asset));
+        when(awardRepository.findByAwardIdentity_EventAndAwardIdentity_Participant(eq(event), eq(participant))).thenReturn(Optional.of(award));
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.EDIT_EVENT.name())));
 
         resource = new EventParticipantResource(
                 eventRepository,
                 participantRepository,
+                assetRepository,
+                awardRepository,
                 auditLogService
         );
     }
@@ -227,6 +258,132 @@ public class EventParticipantResourceTest {
         resource.removeParticipant(
                 eventId,
                 participant.getId(),
+                principal,
+                httpServletRequest);
+    }
+
+    @Test
+    public void testAssignAsset() {
+        AwardAssetChangeRequest changeRequest = new AwardAssetChangeRequest();
+
+        changeRequest.setAssetId(assetId);
+        event.getParticipants().add(participant);
+
+        Award result = resource.assignAsset(
+                eventId,
+                participant.getId(),
+                changeRequest,
+                principal,
+                httpServletRequest);
+
+        verify(awardRepository).save(any(Award.class));
+        verify(auditLogService).log(anyString(), anyString(), anyString());
+
+        assertEquals(asset, result.getAsset());
+        assertEquals(event, result.getAwardIdentity().getEvent());
+        assertEquals(participant, result.getAwardIdentity().getParticipant());
+    }
+
+    @Test
+    public void testAssignAssetNone() {
+        AwardAssetChangeRequest changeRequest = new AwardAssetChangeRequest();
+
+        changeRequest.setAssetId(null);
+        event.getParticipants().add(participant);
+
+        Award result = resource.assignAsset(
+                eventId,
+                participant.getId(),
+                changeRequest,
+                principal,
+                httpServletRequest);
+
+        verify(awardRepository).save(any(Award.class));
+        verify(auditLogService).log(anyString(), anyString(), anyString());
+
+        assertNull(result.getAsset());
+        assertEquals(event, result.getAwardIdentity().getEvent());
+        assertEquals(participant, result.getAwardIdentity().getParticipant());
+    }
+
+    @Test(expected = InsufficientPermissionException.class)
+    public void testAssignAssetNoPermission() {
+        AwardAssetChangeRequest changeRequest = new AwardAssetChangeRequest();
+
+        changeRequest.setAssetId(assetId);
+        event.getParticipants().add(participant);
+
+        when(principal.getAuthorities()).thenReturn(Collections.emptyList());
+
+        resource.assignAsset(
+                eventId,
+                participant.getId(),
+                changeRequest,
+                principal,
+                httpServletRequest);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testAssignAssetNoEvent() {
+        AwardAssetChangeRequest changeRequest = new AwardAssetChangeRequest();
+
+        changeRequest.setAssetId(assetId);
+        event.getParticipants().add(participant);
+
+        when(eventRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
+
+        resource.assignAsset(
+                eventId,
+                participant.getId(),
+                changeRequest,
+                principal,
+                httpServletRequest);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testAssignAssetNoParticipant() {
+        AwardAssetChangeRequest changeRequest = new AwardAssetChangeRequest();
+
+        changeRequest.setAssetId(assetId);
+
+        resource.assignAsset(
+                eventId,
+                participant.getId(),
+                changeRequest,
+                principal,
+                httpServletRequest);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testAssignAssetNoAsset() {
+        AwardAssetChangeRequest changeRequest = new AwardAssetChangeRequest();
+
+        changeRequest.setAssetId(assetId);
+        event.getParticipants().add(participant);
+
+        when(assetRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
+
+        resource.assignAsset(
+                eventId,
+                participant.getId(),
+                changeRequest,
+                principal,
+                httpServletRequest);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testAssignAssetNoAward() {
+        AwardAssetChangeRequest changeRequest = new AwardAssetChangeRequest();
+
+        changeRequest.setAssetId(assetId);
+        event.getParticipants().add(participant);
+
+        when(awardRepository.findByAwardIdentity_EventAndAwardIdentity_Participant(any(Event.class), any(Participant.class))).thenReturn(Optional.empty());
+
+        resource.assignAsset(
+                eventId,
+                participant.getId(),
+                changeRequest,
                 principal,
                 httpServletRequest);
     }

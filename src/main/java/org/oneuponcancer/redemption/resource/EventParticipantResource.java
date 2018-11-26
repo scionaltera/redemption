@@ -1,10 +1,15 @@
 package org.oneuponcancer.redemption.resource;
 
 import org.oneuponcancer.redemption.exception.InsufficientPermissionException;
+import org.oneuponcancer.redemption.model.Asset;
+import org.oneuponcancer.redemption.model.Award;
 import org.oneuponcancer.redemption.model.Event;
 import org.oneuponcancer.redemption.model.Participant;
 import org.oneuponcancer.redemption.model.Permission;
+import org.oneuponcancer.redemption.model.transport.AwardAssetChangeRequest;
 import org.oneuponcancer.redemption.model.transport.EventAddParticipantRequest;
+import org.oneuponcancer.redemption.repository.AssetRepository;
+import org.oneuponcancer.redemption.repository.AwardRepository;
 import org.oneuponcancer.redemption.repository.EventRepository;
 import org.oneuponcancer.redemption.repository.ParticipantRepository;
 import org.oneuponcancer.redemption.service.AuditLogService;
@@ -35,16 +40,22 @@ import java.util.stream.Collectors;
 public class EventParticipantResource {
     private EventRepository eventRepository;
     private ParticipantRepository participantRepository;
+    private AssetRepository assetRepository;
+    private AwardRepository awardRepository;
     private AuditLogService auditLogService;
 
     @Inject
     public EventParticipantResource(
             EventRepository eventRepository,
             ParticipantRepository participantRepository,
+            AssetRepository assetRepository,
+            AwardRepository awardRepository,
             AuditLogService auditLogService) {
 
         this.eventRepository = eventRepository;
         this.participantRepository = participantRepository;
+        this.assetRepository = assetRepository;
+        this.awardRepository = awardRepository;
         this.auditLogService = auditLogService;
     }
 
@@ -129,6 +140,53 @@ public class EventParticipantResource {
 
 
         return savedEvent;
+    }
+
+    @RequestMapping(value = "/{participantId}/asset", method = RequestMethod.POST)
+    @ResponseBody
+    public Award assignAsset(@PathVariable("id") UUID eventId,
+                             @PathVariable("participantId") UUID participantId,
+                             AwardAssetChangeRequest changeRequest,
+                             Principal principal,
+                             HttpServletRequest httpServletRequest) {
+
+        if (((UsernamePasswordAuthenticationToken)principal).getAuthorities().stream().noneMatch(a -> a.getAuthority().equals(Permission.EDIT_EVENT.name()))) {
+            throw new InsufficientPermissionException("Not allowed to edit events.");
+        }
+
+        Event event = eventRepository
+                .findById(eventId)
+                .orElseThrow(() -> new NullPointerException("No such event found."));
+
+        Participant participant = event.getParticipants().stream()
+                .filter(p -> participantId.equals(p.getId()))
+                .findAny()
+                .orElseThrow(() -> new NullPointerException("No such participant found."));
+
+        Asset asset = changeRequest.getAssetId() == null ? null : assetRepository
+                .findById(changeRequest.getAssetId())
+                .orElseThrow(() -> new NullPointerException("No such asset found."));
+
+        Award award = awardRepository
+                .findByAwardIdentity_EventAndAwardIdentity_Participant(event, participant)
+                .orElseThrow(() -> new NullPointerException("No such award found."));
+
+        award.setAsset(asset);
+
+        Award savedAward = awardRepository.save(award);
+
+        auditLogService.log(
+                principal.getName(),
+                auditLogService.extractRemoteIp(httpServletRequest),
+                String.format("Changed award: %s (%s), %s (%s) -> %s (%s)",
+                        participant.getLastName() + ", " + participant.getFirstName(),
+                        participant.getId(),
+                        event.getName(),
+                        event.getId(),
+                        savedAward.getAsset() == null ? "None" : savedAward.getAsset().getName(),
+                        savedAward.getAsset() == null ? "N/A" : savedAward.getAsset().getId()));
+
+        return savedAward;
     }
 
     @ExceptionHandler(NullPointerException.class)

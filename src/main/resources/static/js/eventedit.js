@@ -56,6 +56,29 @@ $(document).ready(function() {
     });
 
     $("#event-participants-edit-form button.btn-danger").click(removeButtonClick);
+
+    $("#event-participants-edit-form select").change(function(event) {
+        var eventId = $(this)[0].dataset.eventId;
+        var participantId = $(this)[0].dataset.participantId;
+        var assetId = $(this).val();
+        var csrfToken = $("meta[name='_csrf']").attr("content");
+
+        $.ajax({
+            url: "/api/v1/event/" + eventId + "/participant/" + participantId + "/asset",
+            method: "POST",
+            data: {
+                "assetId": assetId,
+                "_csrf": csrfToken
+            }
+        }).done(function() {
+            $(event.target).parents("tr").find("p.text-danger").html("");
+        }).fail(function(jqXHR) {
+            $(event.target).parents("tr").find("p.text-danger").html(jqXHR.responseJSON.message.split("\n").join("<br/>"));
+        });
+
+        event.preventDefault();
+        return false;
+    });
 });
 
 var removeButtonClick = function() {

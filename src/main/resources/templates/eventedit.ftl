@@ -53,16 +53,16 @@
                     <div class="form-group">
                         <label for="">Participants</label>
                         <table id="event-participant-table">
-                            <tr><th>Participant</th><th>Award</th><th>Actions</th></tr>
+                            <tr><th>Participant</th><th>Award</th><th>Actions</th><th></th></tr>
                             <#list awards as award>
                             <tr>
                                 <td>${award.awardIdentity.participant.lastName}, ${award.awardIdentity.participant.firstName} (${award.awardIdentity.participant.email})</td>
                                 <td>
-                                <select>
+                                <select data-event-id="${award.awardIdentity.event.id}" data-participant-id="${award.awardIdentity.participant.id}">
                                     <#if award.asset??>
-                                        <option value="none">None</option>
+                                        <option value="">None</option>
                                     <#else>
-                                        <option value="none" selected>None</option>
+                                        <option value="" selected>None</option>
                                     </#if>
                                     <#list assets as asset>
                                         <#if award.asset?? && award.asset.id == asset.id>
@@ -74,6 +74,7 @@
                                 </select>
                                 </td>
                                 <td><button data-csrf-param="${_csrf.parameterName}" data-csrf-token="${_csrf.token}" data-participant-id="${award.awardIdentity.participant.id}" type="submit" class="btn btn-danger">Remove</button></td>
+                                <td><p class="text-danger"></p></td>
                             </tr>
                             </#list>
                         </table>
