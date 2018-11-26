@@ -41,8 +41,33 @@ $(document).ready(function() {
                 var participant = matches[0];
                 var csrfToken = $("meta[name='_csrf']").attr("content");
 
-                var row = $("#event-participant-table tr:last").after(`<tr><td>${participant.lastName}, ${participant.firstName} (${participant.email})</td><td><button data-csrf-param="_csrf" data-csrf-token="${csrfToken}" data-participant-id="${participant.id}" type="submit" class="btn btn-danger">Remove</button></td></tr>`);
-                row.next().find("button").click(removeButtonClick);
+                $.ajax({
+                    url: "/api/v1/asset?eventId=" + event.id,
+                    method: "GET"
+                }).done(function(data) {
+                    var selectOptions = "";
+
+                    for (var i = 0; i < data.length; i++) {
+                        selectOptions += `<option value="${data[0].id}">${data[0].name}</option>\n`;
+                    }
+
+                    var row = $("#event-participant-table tr:last").after(`
+<tr>
+<td>${participant.lastName}, ${participant.firstName} (${participant.email})</td>
+<td>
+    <select data-event-id="${event.id}" data-participant-id="${participant.id}">
+        <option value="">None</option>
+        ${selectOptions}
+    </select>
+</td>
+<td><button data-csrf-param="_csrf" data-csrf-token="${csrfToken}" data-participant-id="${participant.id}" type="submit" class="btn btn-danger">Remove</button></td>
+<td><p class="text-danger"></p></td>
+</tr>`);
+                    row.next().find("button").click(removeButtonClick);
+                    row.next().find("select").change(assetAssignmentChange);
+                }).fail(function(jqXHR) {
+
+                });
             }
         }).fail(function(jqXHR) {
             var errorBox = $("#event-participant-error-box");
@@ -57,28 +82,7 @@ $(document).ready(function() {
 
     $("#event-participants-edit-form button.btn-danger").click(removeButtonClick);
 
-    $("#event-participants-edit-form select").change(function(event) {
-        var eventId = $(this)[0].dataset.eventId;
-        var participantId = $(this)[0].dataset.participantId;
-        var assetId = $(this).val();
-        var csrfToken = $("meta[name='_csrf']").attr("content");
-
-        $.ajax({
-            url: "/api/v1/event/" + eventId + "/participant/" + participantId + "/asset",
-            method: "POST",
-            data: {
-                "assetId": assetId,
-                "_csrf": csrfToken
-            }
-        }).done(function() {
-            $(event.target).parents("tr").find("p.text-danger").html("");
-        }).fail(function(jqXHR) {
-            $(event.target).parents("tr").find("p.text-danger").html(jqXHR.responseJSON.message.split("\n").join("<br/>"));
-        });
-
-        event.preventDefault();
-        return false;
-    });
+    $("#event-participants-edit-form select").change(assetAssignmentChange);
 });
 
 var removeButtonClick = function() {
@@ -99,6 +103,30 @@ var removeButtonClick = function() {
 
         errorBox.removeClass("invisible");
         errorBox.find("p").html(jqXHR.responseJSON.message.split("\n").join("<br/>"));
+    });
+
+    event.preventDefault();
+    return false;
+};
+
+var assetAssignmentChange = function() {
+    var htmlElement = $(this);
+    var eventId = $(this)[0].dataset.eventId;
+    var participantId = $(this)[0].dataset.participantId;
+    var assetId = $(this).val();
+    var csrfToken = $("meta[name='_csrf']").attr("content");
+
+    $.ajax({
+        url: "/api/v1/event/" + eventId + "/participant/" + participantId + "/asset",
+        method: "POST",
+        data: {
+            "assetId": assetId,
+            "_csrf": csrfToken
+        }
+    }).done(function() {
+        htmlElement.parents("tr").find("p.text-danger").html("");
+    }).fail(function(jqXHR) {
+        htmlElement.parents("tr").find("p.text-danger").html(jqXHR.responseJSON.message.split("\n").join("<br/>"));
     });
 
     event.preventDefault();
