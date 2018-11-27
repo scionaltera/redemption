@@ -15,6 +15,15 @@ public class AwardIdentity implements Serializable {
     @JoinColumn(name = "participants_id")
     private Participant participant;
 
+    public AwardIdentity() {
+        // this method intentionally left blank
+    }
+
+    public AwardIdentity(Event event, Participant participant) {
+        this.event = event;
+        this.participant = participant;
+    }
+
     public Event getEvent() {
         return event;
     }

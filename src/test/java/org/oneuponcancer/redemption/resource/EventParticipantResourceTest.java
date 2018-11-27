@@ -2,6 +2,8 @@ package org.oneuponcancer.redemption.resource;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.oneuponcancer.redemption.exception.InsufficientPermissionException;
@@ -25,8 +27,8 @@ import org.springframework.validation.ObjectError;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ValidationException;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -58,6 +60,9 @@ public class EventParticipantResourceTest {
 
     @Mock
     private HttpServletRequest httpServletRequest;
+
+    @Captor
+    private ArgumentCaptor<Award> awardCaptor;
 
     private String participantEmail = "mark@twain.com";
     private Participant participant = new Participant();
@@ -92,7 +97,6 @@ public class EventParticipantResourceTest {
 
         event.setId(eventId);
         event.setName("Test Event");
-        event.setParticipants(new ArrayList<>());
 
         asset.setId(assetId);
         asset.setName("Shiny");
@@ -108,6 +112,7 @@ public class EventParticipantResourceTest {
         when(principal.getName()).thenReturn("Admin");
         when(auditLogService.extractRemoteIp(any(HttpServletRequest.class))).thenReturn("500.501.502.503");
         when(participantRepository.findByEmail(eq(participantEmail))).thenReturn(Optional.of(participant));
+        when(participantRepository.findById(eq(participant.getId()))).thenReturn(Optional.of(participant));
         when(eventRepository.findById(eq(event.getId()))).thenReturn(Optional.of(event));
         when(assetRepository.findById(eq(asset.getId()))).thenReturn(Optional.of(asset));
         when(awardRepository.findByAwardIdentity_EventAndAwardIdentity_Participant(eq(event), eq(participant))).thenReturn(Optional.of(award));
@@ -128,16 +133,23 @@ public class EventParticipantResourceTest {
 
         request.setEmail(participantEmail);
 
-        Event result = resource.addParticipant(
+        Map<String, Object> result = resource.addParticipant(
                 request,
                 bindingResult,
                 eventId,
                 principal,
                 httpServletRequest);
 
-        assertTrue(result.getParticipants().contains(participant));
+        assertEquals(participant, result.get("participant"));
+        assertEquals(eventId, result.get("eventId"));
 
+        verify(awardRepository).save(awardCaptor.capture());
         verify(auditLogService).log(anyString(), anyString(), contains("Added participant"));
+
+        Award award = awardCaptor.getValue();
+
+        assertEquals(event, award.getAwardIdentity().getEvent());
+        assertEquals(participant, award.getAwardIdentity().getParticipant());
     }
 
     @Test(expected = InsufficientPermissionException.class)
@@ -208,24 +220,18 @@ public class EventParticipantResourceTest {
 
     @Test
     public void testRemoveParticipant() {
-        event.getParticipants().add(participant);
-
-        Event result = resource.removeParticipant(
+        resource.removeParticipant(
                 eventId,
                 participant.getId(),
                 principal,
                 httpServletRequest);
 
-        verify(eventRepository).save(any(Event.class));
+        verify(awardRepository).delete(award);
         verify(auditLogService).log(anyString(), anyString(), contains("Removed participant"));
-
-        assertFalse(result.getParticipants().contains(participant));
     }
 
     @Test(expected = InsufficientPermissionException.class)
     public void testRemoveParticipantNoPermission() {
-        event.getParticipants().add(participant);
-
         when(principal.getAuthorities()).thenReturn(Collections.emptyList());
 
         resource.removeParticipant(
@@ -253,35 +259,25 @@ public class EventParticipantResourceTest {
                 httpServletRequest);
     }
 
-    @Test(expected = NullPointerException.class)
-    public void testRemoveParticipantButParticipantIsAlreadyRemoved() {
-        resource.removeParticipant(
-                eventId,
-                participant.getId(),
-                principal,
-                httpServletRequest);
-    }
-
     @Test
     public void testAssignAsset() {
         AwardAssetChangeRequest changeRequest = new AwardAssetChangeRequest();
 
         changeRequest.setAssetId(assetId);
-        event.getParticipants().add(participant);
 
-        Award result = resource.assignAsset(
+        resource.assignAsset(
                 eventId,
                 participant.getId(),
                 changeRequest,
                 principal,
                 httpServletRequest);
 
-        verify(awardRepository).save(any(Award.class));
+        verify(awardRepository).save(awardCaptor.capture());
         verify(auditLogService).log(anyString(), anyString(), anyString());
 
-        assertEquals(asset, result.getAsset());
-        assertEquals(event, result.getAwardIdentity().getEvent());
-        assertEquals(participant, result.getAwardIdentity().getParticipant());
+        Award award = awardCaptor.getValue();
+
+        assertEquals(asset, award.getAsset());
     }
 
     @Test
@@ -289,21 +285,20 @@ public class EventParticipantResourceTest {
         AwardAssetChangeRequest changeRequest = new AwardAssetChangeRequest();
 
         changeRequest.setAssetId(null);
-        event.getParticipants().add(participant);
 
-        Award result = resource.assignAsset(
+        resource.assignAsset(
                 eventId,
                 participant.getId(),
                 changeRequest,
                 principal,
                 httpServletRequest);
 
-        verify(awardRepository).save(any(Award.class));
+        verify(awardRepository).save(awardCaptor.capture());
         verify(auditLogService).log(anyString(), anyString(), anyString());
 
-        assertNull(result.getAsset());
-        assertEquals(event, result.getAwardIdentity().getEvent());
-        assertEquals(participant, result.getAwardIdentity().getParticipant());
+        Award award = awardCaptor.getValue();
+
+        assertNull(award.getAsset());
     }
 
     @Test(expected = InsufficientPermissionException.class)
@@ -311,7 +306,6 @@ public class EventParticipantResourceTest {
         AwardAssetChangeRequest changeRequest = new AwardAssetChangeRequest();
 
         changeRequest.setAssetId(assetId);
-        event.getParticipants().add(participant);
 
         when(principal.getAuthorities()).thenReturn(Collections.emptyList());
 
@@ -328,7 +322,6 @@ public class EventParticipantResourceTest {
         AwardAssetChangeRequest changeRequest = new AwardAssetChangeRequest();
 
         changeRequest.setAssetId(assetId);
-        event.getParticipants().add(participant);
 
         when(eventRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
 
@@ -348,7 +341,7 @@ public class EventParticipantResourceTest {
 
         resource.assignAsset(
                 eventId,
-                participant.getId(),
+                UUID.randomUUID(),
                 changeRequest,
                 principal,
                 httpServletRequest);
@@ -359,7 +352,6 @@ public class EventParticipantResourceTest {
         AwardAssetChangeRequest changeRequest = new AwardAssetChangeRequest();
 
         changeRequest.setAssetId(assetId);
-        event.getParticipants().add(participant);
 
         when(assetRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
 
@@ -376,7 +368,6 @@ public class EventParticipantResourceTest {
         AwardAssetChangeRequest changeRequest = new AwardAssetChangeRequest();
 
         changeRequest.setAssetId(assetId);
-        event.getParticipants().add(participant);
 
         when(awardRepository.findByAwardIdentity_EventAndAwardIdentity_Participant(any(Event.class), any(Participant.class))).thenReturn(Optional.empty());
 

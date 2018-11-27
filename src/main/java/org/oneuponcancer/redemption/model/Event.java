@@ -4,12 +4,9 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -25,9 +22,6 @@ public class Event {
     private String description;
     private Date startDate;
     private Date endDate;
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    private List<Participant> participants;
 
     public UUID getId() {
         return id;
@@ -67,14 +61,6 @@ public class Event {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
-    }
-
-    public List<Participant> getParticipants() {
-        return participants;
-    }
-
-    public void setParticipants(List<Participant> participants) {
-        this.participants = participants;
     }
 
     @Override

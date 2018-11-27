@@ -28,47 +28,43 @@ $(document).ready(function() {
 
     $("#event-participants-edit-form button.btn-primary").click(function() {
         var form = $("#event-participants-edit-form form");
-        var submittedEmail = $("#event-participant").val();
 
         $.ajax({
             url: form.attr("action"),
             method: "POST",
             data: form.serialize()
-        }).done(function(event) {
-            var matches = event.participants.filter(p => p.email === submittedEmail);
+        }).done(function(response) {
+            var participant = response['participant'];
+            var eventId = response['eventId'];
+            var csrfToken = $("meta[name='_csrf']").attr("content");
 
-            if (matches.length > 0) {
-                var participant = matches[0];
-                var csrfToken = $("meta[name='_csrf']").attr("content");
+            $.ajax({
+                url: "/api/v1/asset?eventId=" + eventId,
+                method: "GET"
+            }).done(function(data) {
+                var selectOptions = "";
 
-                $.ajax({
-                    url: "/api/v1/asset?eventId=" + event.id,
-                    method: "GET"
-                }).done(function(data) {
-                    var selectOptions = "";
+                for (var i = 0; i < data.length; i++) {
+                    selectOptions += `<option value="${data[0].id}">${data[0].name}</option>\n`;
+                }
 
-                    for (var i = 0; i < data.length; i++) {
-                        selectOptions += `<option value="${data[0].id}">${data[0].name}</option>\n`;
-                    }
-
-                    var row = $("#event-participant-table tr:last").after(`
+                var row = $("#event-participant-table tr:last").after(`
 <tr>
 <td>${participant.lastName}, ${participant.firstName} (${participant.email})</td>
 <td>
-    <select data-event-id="${event.id}" data-participant-id="${participant.id}">
-        <option value="">None</option>
-        ${selectOptions}
-    </select>
+<select data-event-id="${eventId}" data-participant-id="${participant.id}">
+    <option value="">None</option>
+    ${selectOptions}
+</select>
 </td>
 <td><button data-csrf-param="_csrf" data-csrf-token="${csrfToken}" data-participant-id="${participant.id}" type="submit" class="btn btn-danger">Remove</button></td>
 <td><p class="text-danger"></p></td>
 </tr>`);
-                    row.next().find("button").click(removeButtonClick);
-                    row.next().find("select").change(assetAssignmentChange);
-                }).fail(function(jqXHR) {
-
-                });
-            }
+                row.next().find("button").click(removeButtonClick);
+                row.next().find("select").change(assetAssignmentChange);
+            }).fail(function(jqXHR) {
+                console.log("Failed to fetch awards: " + jqXHR.responseJSON.message);
+            });
         }).fail(function(jqXHR) {
             var errorBox = $("#event-participant-error-box");
 

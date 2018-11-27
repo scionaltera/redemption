@@ -25,7 +25,6 @@ import javax.validation.Valid;
 import javax.validation.ValidationException;
 import java.io.IOException;
 import java.security.Principal;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -74,7 +73,6 @@ public class EventResource {
         event.setDescription(eventCreateRequest.getDescription());
         event.setStartDate(eventCreateRequest.getStartDate());
         event.setEndDate(eventCreateRequest.getEndDate());
-        event.setParticipants(Collections.emptyList());
 
         Event savedEvent = eventRepository.save(event);
 

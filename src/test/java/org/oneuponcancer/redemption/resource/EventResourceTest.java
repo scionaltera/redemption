@@ -123,7 +123,6 @@ public class EventResourceTest {
         assertEquals("A big bag of foop.", event.getDescription());
         assertEquals(tomorrow, event.getStartDate());
         assertEquals(nextWeek, event.getEndDate());
-        assertEquals(Collections.emptyList(), event.getParticipants());
     }
 
     @Test(expected = InsufficientPermissionException.class)
@@ -235,8 +234,6 @@ public class EventResourceTest {
         EventEditRequest editRequest = new EventEditRequest();
         Event event = new Event();
 
-        event.setParticipants(Collections.emptyList());
-
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.EDIT_EVENT.name())));
         when(eventRepository.findById(eq(uuid))).thenReturn(Optional.of(event));
 
@@ -258,7 +255,6 @@ public class EventResourceTest {
         assertEquals("A big bag of foop.", event.getDescription());
         assertEquals(tomorrow, event.getStartDate());
         assertEquals(nextWeek, event.getEndDate());
-        assertNotNull(event.getParticipants());
 
         verify(eventRepository).save(eq(event));
         verify(auditLogService).extractRemoteIp(eq(request));
