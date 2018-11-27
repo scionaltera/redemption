@@ -1,14 +1,15 @@
 package org.oneuponcancer.redemption.resource;
 
-
 import org.oneuponcancer.redemption.exception.InsufficientPermissionException;
 import org.oneuponcancer.redemption.loader.StaffLoader;
 import org.oneuponcancer.redemption.model.Asset;
+import org.oneuponcancer.redemption.model.Award;
 import org.oneuponcancer.redemption.model.Event;
 import org.oneuponcancer.redemption.model.Participant;
 import org.oneuponcancer.redemption.model.Permission;
 import org.oneuponcancer.redemption.model.Staff;
 import org.oneuponcancer.redemption.repository.AssetRepository;
+import org.oneuponcancer.redemption.repository.AwardRepository;
 import org.oneuponcancer.redemption.repository.EventRepository;
 import org.oneuponcancer.redemption.repository.ParticipantRepository;
 import org.oneuponcancer.redemption.repository.StaffRepository;
@@ -38,6 +39,7 @@ public class IndexResource {
     private AssetRepository assetRepository;
     private ParticipantRepository participantRepository;
     private EventRepository eventRepository;
+    private AwardRepository awardRepository;
 
     @Inject
     public IndexResource(String applicationVersion,
@@ -45,13 +47,15 @@ public class IndexResource {
                          StaffRepository staffRepository,
                          AssetRepository assetRepository,
                          ParticipantRepository participantRepository,
-                         EventRepository eventRepository) {
+                         EventRepository eventRepository,
+                         AwardRepository awardRepository) {
         this.applicationVersion = applicationVersion;
         this.staffLoader = staffLoader;
         this.staffRepository = staffRepository;
         this.assetRepository = assetRepository;
         this.participantRepository = participantRepository;
         this.eventRepository = eventRepository;
+        this.awardRepository = awardRepository;
     }
 
     @RequestMapping("/")
@@ -199,10 +203,14 @@ public class IndexResource {
                 .findById(uuid)
                 .orElseThrow(() -> new IllegalArgumentException("No event with provided ID"));
 
+        List<Asset> assets = assetRepository.findByEvent(event);
+        List<Award> awards = awardRepository.findByAwardIdentity_Event(event);
+
         model.addAttribute("version", applicationVersion);
         model.addAttribute("permissions", Permission.values());
         model.addAttribute("event", event);
-        model.addAttribute("participants", event.getParticipants());
+        model.addAttribute("assets", assets);
+        model.addAttribute("awards", awards);
 
         return "eventedit";
     }

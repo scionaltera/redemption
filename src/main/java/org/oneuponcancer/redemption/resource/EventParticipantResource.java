@@ -1,10 +1,16 @@
 package org.oneuponcancer.redemption.resource;
 
 import org.oneuponcancer.redemption.exception.InsufficientPermissionException;
+import org.oneuponcancer.redemption.model.Asset;
+import org.oneuponcancer.redemption.model.Award;
+import org.oneuponcancer.redemption.model.AwardIdentity;
 import org.oneuponcancer.redemption.model.Event;
 import org.oneuponcancer.redemption.model.Participant;
 import org.oneuponcancer.redemption.model.Permission;
+import org.oneuponcancer.redemption.model.transport.AwardAssetChangeRequest;
 import org.oneuponcancer.redemption.model.transport.EventAddParticipantRequest;
+import org.oneuponcancer.redemption.repository.AssetRepository;
+import org.oneuponcancer.redemption.repository.AwardRepository;
 import org.oneuponcancer.redemption.repository.EventRepository;
 import org.oneuponcancer.redemption.repository.ParticipantRepository;
 import org.oneuponcancer.redemption.service.AuditLogService;
@@ -27,6 +33,8 @@ import javax.validation.Valid;
 import javax.validation.ValidationException;
 import java.io.IOException;
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -35,26 +43,32 @@ import java.util.stream.Collectors;
 public class EventParticipantResource {
     private EventRepository eventRepository;
     private ParticipantRepository participantRepository;
+    private AssetRepository assetRepository;
+    private AwardRepository awardRepository;
     private AuditLogService auditLogService;
 
     @Inject
     public EventParticipantResource(
             EventRepository eventRepository,
             ParticipantRepository participantRepository,
+            AssetRepository assetRepository,
+            AwardRepository awardRepository,
             AuditLogService auditLogService) {
 
         this.eventRepository = eventRepository;
         this.participantRepository = participantRepository;
+        this.assetRepository = assetRepository;
+        this.awardRepository = awardRepository;
         this.auditLogService = auditLogService;
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)
     @ResponseBody
-    public Event addParticipant(@Valid EventAddParticipantRequest eventAddParticipantRequest,
-                                BindingResult bindingResult,
-                                @PathVariable("id") UUID eventId,
-                                Principal principal,
-                                HttpServletRequest request) {
+    public Map<String, Object> addParticipant(@Valid EventAddParticipantRequest eventAddParticipantRequest,
+                                              BindingResult bindingResult,
+                                              @PathVariable("id") UUID eventId,
+                                              Principal principal,
+                                              HttpServletRequest request) {
 
         if (((UsernamePasswordAuthenticationToken)principal).getAuthorities().stream().noneMatch(a -> a.getAuthority().equals(Permission.EDIT_EVENT.name()))) {
             throw new InsufficientPermissionException("Not allowed to edit events.");
@@ -77,9 +91,10 @@ public class EventParticipantResource {
                 .findById(eventId)
                 .orElseThrow(() -> new NullPointerException("No such event found."));
 
-        event.getParticipants().add(participant);
+        Award award = new Award();
+        award.setAwardIdentity(new AwardIdentity(event, participant));
 
-        Event savedEvent = eventRepository.save(event);
+        awardRepository.save(award);
 
         auditLogService.log(
                 principal.getName(),
@@ -90,13 +105,17 @@ public class EventParticipantResource {
                         event.getName(),
                         event.getId()));
 
+        Map<String, Object> response = new HashMap<>();
 
-        return savedEvent;
+        response.put("participant", participant);
+        response.put("eventId", event.getId());
+
+        return response;
     }
 
     @RequestMapping(value = "/{participantId}", method = RequestMethod.DELETE)
     @ResponseBody
-    public Event removeParticipant(@PathVariable("id") UUID eventId,
+    public void removeParticipant(@PathVariable("id") UUID eventId,
                                    @PathVariable("participantId") UUID participantId,
                                    Principal principal,
                                    HttpServletRequest httpServletRequest) {
@@ -109,14 +128,15 @@ public class EventParticipantResource {
                 .findById(eventId)
                 .orElseThrow(() -> new NullPointerException("No such event found."));
 
-        Participant participant = event.getParticipants().stream()
-                .filter(p -> participantId.equals(p.getId()))
-                .findAny()
+        Participant participant = participantRepository
+                .findById(participantId)
                 .orElseThrow(() -> new NullPointerException("No such participant found."));
 
-        event.getParticipants().remove(participant);
+        Award award = awardRepository
+                .findByAwardIdentity_EventAndAwardIdentity_Participant(event, participant)
+                .orElseThrow(() -> new NullPointerException("No such award found."));
 
-        Event savedEvent = eventRepository.save(event);
+        awardRepository.delete(award);
 
         auditLogService.log(
                 principal.getName(),
@@ -126,9 +146,50 @@ public class EventParticipantResource {
                         participant.getId(),
                         event.getName(),
                         event.getId()));
+    }
 
+    @RequestMapping(value = "/{participantId}/asset", method = RequestMethod.POST)
+    @ResponseBody
+    public void assignAsset(@PathVariable("id") UUID eventId,
+                             @PathVariable("participantId") UUID participantId,
+                             AwardAssetChangeRequest changeRequest,
+                             Principal principal,
+                             HttpServletRequest httpServletRequest) {
 
-        return savedEvent;
+        if (((UsernamePasswordAuthenticationToken)principal).getAuthorities().stream().noneMatch(a -> a.getAuthority().equals(Permission.EDIT_EVENT.name()))) {
+            throw new InsufficientPermissionException("Not allowed to edit events.");
+        }
+
+        Event event = eventRepository
+                .findById(eventId)
+                .orElseThrow(() -> new NullPointerException("No such event found."));
+
+        Participant participant = participantRepository
+                .findById(participantId)
+                .orElseThrow(() -> new NullPointerException("No such participant found."));
+
+        Asset asset = changeRequest.getAssetId() == null ? null : assetRepository
+                .findById(changeRequest.getAssetId())
+                .orElseThrow(() -> new NullPointerException("No such asset found."));
+
+        Award award = awardRepository
+                .findByAwardIdentity_EventAndAwardIdentity_Participant(event, participant)
+                .orElseThrow(() -> new NullPointerException("No such award found."));
+
+        award.setAsset(asset);
+
+        awardRepository.save(award);
+
+        auditLogService.log(
+                principal.getName(),
+                auditLogService.extractRemoteIp(httpServletRequest),
+                String.format("Changed award: %s (%s), %s (%s) -> %s (%s)",
+                        participant.getLastName() + ", " + participant.getFirstName(),
+                        participant.getId(),
+                        event.getName(),
+                        event.getId(),
+                        award.getAsset() == null ? "None" : award.getAsset().getName(),
+                        award.getAsset() == null ? "N/A" : award.getAsset().getId()));
     }
 
     @ExceptionHandler(NullPointerException.class)

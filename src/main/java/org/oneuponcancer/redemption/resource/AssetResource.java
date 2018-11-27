@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.inject.Inject;
@@ -51,9 +52,17 @@ public class AssetResource {
 
     @RequestMapping("")
     @ResponseBody
-    public List<Asset> fetchAsset(Principal principal) {
+    public List<Asset> fetchAsset(Principal principal, @RequestParam(required = false) UUID eventId) {
         if (((UsernamePasswordAuthenticationToken)principal).getAuthorities().stream().noneMatch(a -> a.getAuthority().equals(Permission.LIST_ASSET.name()))) {
             throw new InsufficientPermissionException("Not allowed to list assets.");
+        }
+
+        if (eventId != null) {
+            Event event = eventRepository
+                    .findById(eventId)
+                    .orElseThrow(() -> new NullPointerException("Event not found."));
+
+            return assetRepository.findByEvent(event);
         }
 
         return assetRepository.findAll();

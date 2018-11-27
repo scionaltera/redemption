@@ -12,6 +12,7 @@ import org.oneuponcancer.redemption.model.Participant;
 import org.oneuponcancer.redemption.model.Permission;
 import org.oneuponcancer.redemption.model.Staff;
 import org.oneuponcancer.redemption.repository.AssetRepository;
+import org.oneuponcancer.redemption.repository.AwardRepository;
 import org.oneuponcancer.redemption.repository.EventRepository;
 import org.oneuponcancer.redemption.repository.ParticipantRepository;
 import org.oneuponcancer.redemption.repository.StaffRepository;
@@ -53,6 +54,9 @@ public class IndexResourceTest {
     private EventRepository eventRepository;
 
     @Mock
+    private AwardRepository awardRepository;
+
+    @Mock
     private Staff staff;
 
     @Mock
@@ -76,7 +80,8 @@ public class IndexResourceTest {
                 staffRepository,
                 assetRepository,
                 participantRepository,
-                eventRepository);
+                eventRepository,
+                awardRepository);
     }
 
     @Test
@@ -419,10 +424,15 @@ public class IndexResourceTest {
 
         assertEquals("eventedit", result);
 
+        verify(eventRepository).findById(uuid);
+        verify(assetRepository).findByEvent(event);
+        verify(awardRepository).findByAwardIdentity_Event(event);
+
         verify(model).addAttribute(eq("version"), eq(APPLICATION_VERSION));
         verify(model).addAttribute(eq("permissions"), any(Permission[].class));
         verify(model).addAttribute(eq("event"), any(Event.class));
-        verify(model).addAttribute(eq("participants"), anyIterable());
+        verify(model).addAttribute(eq("assets"), anyIterable());
+        verify(model).addAttribute(eq("awards"), anyIterable());
     }
 
     @Test(expected = InsufficientPermissionException.class)

@@ -56,6 +56,9 @@ public class AssetResourceTest {
     private List<Asset> allAssets = new ArrayList<>();
     private List<Event> allEvents = new ArrayList<>();
 
+    private Event event = new Event();
+    private Asset asset = new Asset();
+
     private AssetResource assetResource;
 
     @Before
@@ -76,7 +79,14 @@ public class AssetResourceTest {
             allEvents.add(event);
         }
 
+        event.setId(UUID.randomUUID());
+        asset.setId(UUID.randomUUID());
+
+        asset.setEvent(event);
+
+        when(eventRepository.findById(eq(event.getId()))).thenReturn(Optional.of(event));
         when(assetRepository.findAll()).thenReturn(allAssets);
+        when(assetRepository.findByEvent(eq(event))).thenReturn(Collections.singletonList(asset));
         when(assetRepository.save(any(Asset.class))).thenAnswer(i -> {
             Asset asset = i.getArgument(0);
 
@@ -96,14 +106,24 @@ public class AssetResourceTest {
     public void testFetchAsset() {
         when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.LIST_ASSET.name())));
 
-        List<Asset> result = assetResource.fetchAsset(principal);
+        List<Asset> result = assetResource.fetchAsset(principal, null);
 
-        assertFalse(result.isEmpty());
+        assertEquals(allAssets.size(), result.size());
+    }
+
+    @Test
+    public void testFetchAssetByEvent() {
+        when(principal.getAuthorities()).thenReturn(Collections.singletonList(new SimpleGrantedAuthority(Permission.LIST_ASSET.name())));
+
+        List<Asset> result = assetResource.fetchAsset(principal, event.getId());
+
+        assertEquals(asset, result.get(0));
+        assertEquals(1, result.size());
     }
 
     @Test(expected = InsufficientPermissionException.class)
     public void testFetchAssetNoPermission() {
-        assetResource.fetchAsset(principal);
+        assetResource.fetchAsset(principal, null);
     }
 
     @Test
