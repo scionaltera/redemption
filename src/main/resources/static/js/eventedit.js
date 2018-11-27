@@ -45,7 +45,7 @@ $(document).ready(function() {
                 var selectOptions = "";
 
                 for (var i = 0; i < data.length; i++) {
-                    selectOptions += `<option value="${data[0].id}">${data[0].name}</option>\n`;
+                    selectOptions += `<option value="${data[i].id}">${data[i].name}</option>\n`;
                 }
 
                 var row = $("#event-participant-table tr:last").after(`
