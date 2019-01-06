@@ -20,8 +20,15 @@ phases:
       - docker tag scionaltera/redemption:latest scionaltera/redemption:${PROJECT_VERSION}
   post_build:
     commands:
-      - docker push scionaltera/redemption:latest
-      - docker push scionaltera/redemption:${PROJECT_VERSION}
+      - echo "CodeBuild Initiator is ${CODEBUILD_INITIATOR}"
+      - |
+        if expr "${CODEBUILD_INITIATOR}": "codepipeline*" >/dev/null; then
+          docker push scionaltera/redemption:latest
+        fi
+      - |
+        if expr "${CODEBUILD_INITIATOR}" : "codepipeline*" >/dev/null; then
+          docker push scionaltera/redemption:${PROJECT_VERSION}
+        fi
       - printf '[{"name":"redemption","imageUri":"%s"}]' scionaltera/redemption:${PROJECT_VERSION} > imagedefinitions.json
 artifacts:
   files: imagedefinitions.json
