@@ -4,7 +4,7 @@
 # file are not recommended for production use.
 #
 
-FROM frolvlad/alpine-oraclejre8:slim
+FROM openjdk:8-jre-alpine
 MAINTAINER Peter Keeler <peter@bonevm.com>
 EXPOSE 8080
 COPY redemption-*.jar /opt/app/app.jar
