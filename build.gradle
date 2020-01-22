@@ -50,7 +50,7 @@ dependencies {
     compile group: 'org.apache.commons', name: 'commons-text', version: '1.6'
 
     compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.16'
-    compile group: 'org.flywaydb', name: 'flyway-core', version: '5.2.4'
+    compile group: 'org.flywaydb', name: 'flyway-core', version: '6.1.4'
 
     compile group: 'org.webjars', name: 'webjars-locator-core', version: '0.37'
     compile group: 'org.webjars', name: 'jquery', version: '3.4.1'
