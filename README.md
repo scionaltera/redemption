@@ -1,5 +1,6 @@
 # Redemption
 ![AWS CodeBuild](https://codebuild.us-west-2.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoibTY4T2JxQ2IvQ0YybURlS0VDNXZ5YXFyU2ozZVhhMldJZ0FEd1V5dzhXalUrdVhhK2h3eHh5UW1SeXo0MG9OVy9HQmpNYnlUY09CSStOSHQyYTlzc0lBPSIsIml2UGFyYW1ldGVyU3BlYyI6IlU3WG5BMTdEQi95cVlvcjciLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master)
+[![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=scionaltera/redemption)](https://dependabot.com)
 [![Website](https://img.shields.io/website/https/redemption.bonevm.com.svg?label=website "Website")](https://redemption.bonevm.com)  
 ## Introduction
 Redemption is a platform for the folks at [1UpOnCancer](http://www.1uponcancer.org/) to use to manage the competitions and giveaways they do. They have to manage a lot of Steam keys and other prizes, participants and events and needed a database to help with that. I have decided to make it an open source project in case there are other organizations that need a similar way to organize their contest assets.
