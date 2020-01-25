@@ -4,9 +4,9 @@
 <head>
     <title>Dashboard - Redemption</title>
 
-    <#include "stdmeta.inc.ftl">
-    <#include "stdlinks.inc.ftl">
-    <#include "internal.inc.ftl">
+    <#include "stdmeta.inc.ftlh">
+    <#include "stdlinks.inc.ftlh">
+    <#include "internal.inc.ftlh">
     <link rel="stylesheet" href="<@spring.url '/css/dashboard.css'/>"/>
 </head>
 <body>
@@ -103,7 +103,7 @@
 </#if>
     <div class="row">
         <div class="col">
-        <#include "copyright.inc.ftl">
+        <#include "copyright.inc.ftlh">
         </div>
     </div>
 </div>
@@ -114,7 +114,7 @@
 </#list>
 </div>
 
-<#include "stdimports.inc.ftl">
+<#include "stdimports.inc.ftlh">
 <script type="text/javascript" src="<@spring.url 'js/auditlog.js'/>"></script>
 <script type="text/javascript" src="<@spring.url 'js/participantdashboard.js'/>"></script>
 <script type="text/javascript" src="<@spring.url 'js/staffdashboard.js'/>"></script>

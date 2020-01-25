@@ -4,8 +4,8 @@
 <head>
     <title>Home - Redemption</title>
 
-    <#include "stdmeta.inc.ftl">
-    <#include "stdlinks.inc.ftl">
+    <#include "stdmeta.inc.ftlh">
+    <#include "stdlinks.inc.ftlh">
     <link rel="stylesheet" href="<@spring.url '/css/index.css'/>"/>
 </head>
 <body>
@@ -36,7 +36,7 @@
     </div>
 </div>
 
-<#include "copyright.inc.ftl">
-<#include "stdimports.inc.ftl">
+<#include "copyright.inc.ftlh">
+<#include "stdimports.inc.ftlh">
 </body>
 </html>

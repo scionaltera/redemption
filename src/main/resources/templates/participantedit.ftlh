@@ -4,9 +4,9 @@
 <head>
     <title>Edit Participant - Redemption</title>
 
-    <#include "stdmeta.inc.ftl">
-    <#include "stdlinks.inc.ftl">
-    <#include "internal.inc.ftl">
+    <#include "stdmeta.inc.ftlh">
+    <#include "stdlinks.inc.ftlh">
+    <#include "internal.inc.ftlh">
     <link rel="stylesheet" href="<@spring.url '/css/participantedit.css'/>"/>
 </head>
 <body>
@@ -40,12 +40,12 @@
     </div>
     <div class="row">
         <div class="col">
-        <#include "copyright.inc.ftl">
+        <#include "copyright.inc.ftlh">
         </div>
     </div>
 </div>
 
-<#include "stdimports.inc.ftl">
+<#include "stdimports.inc.ftlh">
 <script src="<@spring.url '/js/participantedit.js'/>"></script>
 </body>
 </html>
