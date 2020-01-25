@@ -23,7 +23,7 @@ phases:
     commands:
       - echo "CodeBuild Initiator is ${CODEBUILD_INITIATOR}"
       - |
-        if expr "${CODEBUILD_INITIATOR}": "codepipeline*" >/dev/null; then
+        if expr "${CODEBUILD_INITIATOR}" : "codepipeline*" >/dev/null; then
           docker tag scionaltera/redemption:latest scionaltera/redemption:${PROJECT_VERSION}
           docker push scionaltera/redemption:latest
           docker push scionaltera/redemption:${PROJECT_VERSION}
