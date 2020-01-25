@@ -24,7 +24,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/api/v1/audit")
 public class AuditLogResource {
-    private static final Sort SORT_DESC = new Sort(Sort.Direction.DESC,"timestamp");
+    private static final Sort SORT_DESC = Sort.by(Sort.Direction.DESC, "timestamp");
 
     private AuditLogRepository auditLogRepository;
     private Integer auditServiceRequestMax;
