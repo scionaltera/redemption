@@ -1,5 +1,5 @@
 group 'org.oneuponcancer'
-version '0.14.3'
+version '0.14.4'
 
 apply plugin: 'java'
 apply plugin: 'info.solidsoft.pitest'
@@ -23,7 +23,7 @@ buildscript {
         classpath group: 'org.kordamp.gradle', name: 'stats-gradle-plugin', version: '0.2.2'
         classpath group: 'se.transmode.gradle', name: 'gradle-docker', version: '1.2'
         classpath group: 'org.springframework.boot', name: 'spring-boot-gradle-plugin', version: '2.2.5.RELEASE'
-        classpath group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: '1.4.6'
+        classpath group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: '1.4.7'
     }
 }
 
